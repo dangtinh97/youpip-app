@@ -1,0 +1,28 @@
+version: '3'
+services:
+  nginx_pip:
+    container_name: 'nginx_pip'
+    image: 'nginx:latest'
+    working_dir: /var/www/html
+    volumes:
+      - ../:/var/www/html
+      - ./nginx/conf.d/default.conf:/etc/nginx/nginx.conf
+    ports:
+      - '8088:80'
+    networks:
+      - backend
+  php_pip:
+    container_name: 'php_pip'
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    working_dir: /var/www/html
+    volumes:
+      - ../:/var/www/html
+    ports:
+      - '9000:9000'
+    networks:
+      - backend
+networks:
+  backend:
+    driver: bridge

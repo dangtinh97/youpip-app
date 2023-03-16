@@ -23,5 +23,5 @@ Route::controller(\App\Http\Controllers\Api\YoutubeController::class)
     ->prefix('youtube')
     ->group(function (){
         Route::get('/new','videoNew');
-    })
-;
+        Route::get('/link-video','linkVideo');
+    });

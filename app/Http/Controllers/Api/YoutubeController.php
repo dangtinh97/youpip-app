@@ -25,4 +25,17 @@ class YoutubeController extends Controller
 
         return response()->json($result->toArray());
     }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function linkVideo(Request $request): JsonResponse
+    {
+        $videoId = (string)$request->get('video-id');
+        $find = $this->youtubeService->linkVideo($videoId);
+
+        return response()->json($find->toArray());
+    }
 }

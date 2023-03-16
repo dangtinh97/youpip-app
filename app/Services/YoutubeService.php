@@ -4,9 +4,12 @@ namespace App\Services;
 
 use App\Enums\ELinkYoutube;
 use App\Http\Response\ApiResponse;
+use App\Http\Response\ResponseError;
 use App\Http\Response\ResponseSuccess;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
+use YouTube\Exception\YouTubeException;
+use YouTube\YouTubeDownloader;
 
 class YoutubeService
 {
@@ -58,5 +61,34 @@ class YoutubeService
             'list' => $output,
             'token' => $token
         ]);
+    }
+
+    /**
+     * @param string $videoId
+     *
+     * @return \App\Http\Response\ApiResponse
+     */
+    function linkVideo(string $videoId): ApiResponse
+    {
+        $youtube = new YouTubeDownloader();
+        $url = ELinkYoutube::BASE_URL->value."/watch?v={$videoId}";
+        $output = [];
+        try {
+            $downloadOptions = $youtube->getDownloadLinks($url);
+            /** @var array $combine */
+            if(!$combine = $downloadOptions->getCombinedFormats()){
+                return new ResponseError();
+            }
+            /** @var \YouTube\Models\StreamFormat $last */
+            $last = Arr::last($combine);
+            $output = [
+                'mime_type' => $last->mimeType,
+                'url' => $last->url,
+                'quality' => $last->quality
+            ];
+        } catch (YouTubeException $e) {
+        }
+
+        return !$output ? new ResponseError() : new ResponseSuccess($output);
     }
 }

@@ -12,6 +12,7 @@ use App\Repositories\ViewRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use MongoDB\BSON\UTCDateTime;
 use YouTube\Exception\YouTubeException;
 use YouTube\YouTubeDownloader;
@@ -36,11 +37,15 @@ class YoutubeService
     public function listVideo(string $token): ApiResponse
     {
         $url = ELinkYoutube::BASE_URL->value.'/index?gl=VN';
+
         $body = Http::withHeaders([
             'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
             'accept-language' => 'vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5'
         ])->get($url)->body();
-        preg_match('/ytInitialData =(.*?);</i', $body, $matches);
+        preg_match('/var ytInitialData =(.*?);</i', $body, $matches);
+        if (count($matches) !== 2) {
+            return new ResponseSuccess();
+        }
         $varScript = trim($matches[1]);
         $data = json_decode($varScript, true);
         if (!is_array($data)) {
@@ -181,6 +186,64 @@ class YoutubeService
 
         return new ResponseSuccess([
             'list' => $data
+        ]);
+    }
+
+    /**
+     * @param string $q
+     *
+     * @return \App\Http\Response\ApiResponse
+     */
+    public function search(string $q): ApiResponse
+    {
+        if (!$q) {
+            return $this->listVideo("");
+        }
+        $q = str_replace(" ", '+', $q);
+        $url = ELinkYoutube::BASE_URL->value."/results?search_query={$q}&gl=VN";
+
+        $body = Http::withHeaders([
+            'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
+            'accept-language' => 'vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5'
+        ])->get($url)->body();
+        preg_match('/var ytInitialData =(.*?);</i', $body, $matches);
+        if (count($matches) !== 2) {
+            return new ResponseError();
+        }
+
+        $json = trim($matches[1]);
+        $data = json_decode($json, true);
+        $contents = (array)Arr::get($data,
+            'contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.0.itemSectionRenderer.contents',
+            []);
+        $output = [];
+        foreach ($contents as $content) {
+            /** @var array $content */
+            $videoRender = (array)Arr::get($content, 'videoRenderer');
+            if (!is_array($videoRender) || !$videoId = Arr::get($videoRender, 'videoId')) {
+                continue;
+            }
+            $publishTime = (string)Arr::get($videoRender, 'publishedTimeText.simpleText');
+            $timeText = (string)Arr::get($videoRender, 'lengthText.simpleText');
+            if (!$publishTime || !$timeText) {
+                continue;
+            }
+            $output[] = [
+                'video_id' => $videoId,
+                'thumbnail' => (string)Arr::get($videoRender, 'thumbnail.thumbnails.0.url'),
+                'title' => (string)Arr::get($videoRender, 'title.runs.0.text'),
+                'time_text' => $timeText,
+                'view_count_text' => (string)Arr::get($videoRender, 'viewCountText.simpleText'),
+                'chanel_name' => (string)Arr::get($videoRender, 'longBylineText.runs.0.text'),
+                'chanel_url' => (string)Arr::get($videoRender,
+                    'longBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl'),
+                'published_time' => $publishTime
+            ];
+        }
+
+        return new ResponseSuccess([
+            'list' => $output,
+            'q' => $q
         ]);
     }
 }

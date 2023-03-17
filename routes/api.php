@@ -28,6 +28,7 @@ Route::controller(YoutubeController::class)
         Route::get('/new','videoNew');
         Route::get('/link-video','linkVideo');
         Route::get('/suggest','suggest');
+        Route::get('/search','search');
     });
 
 Route::controller(AuthController::class)

@@ -20,8 +20,7 @@ class YoutubeController extends Controller
      */
     public function videoNew(Request $request): JsonResponse
     {
-        $token = (string)$request->get('token', '');
-        $result = $this->youtubeService->listVideo($token);
+        $result = $this->youtubeService->listVideo("");
 
         return response()->json($result->toArray());
     }
@@ -50,5 +49,17 @@ class YoutubeController extends Controller
         $result = $this->youtubeService->suggest($keyword);
 
         return response()->json($result->toArray());
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function search(Request $request): JsonResponse
+    {
+        $search = $this->youtubeService->search((string)$request->get('q'));
+
+        return response()->json($search->toArray());
     }
 }

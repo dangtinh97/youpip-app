@@ -27,6 +27,7 @@ Route::controller(YoutubeController::class)
     ->group(function (){
         Route::get('/new','videoNew');
         Route::get('/link-video','linkVideo');
+        Route::get('/suggest','suggest');
     });
 
 Route::controller(AuthController::class)

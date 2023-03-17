@@ -38,4 +38,17 @@ class YoutubeController extends Controller
 
         return response()->json($find->toArray());
     }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function suggest(Request $request): JsonResponse
+    {
+        $keyword = (string)$request->get('keyword', '');
+        $result = $this->youtubeService->suggest($keyword);
+
+        return response()->json($result->toArray());
+    }
 }

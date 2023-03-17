@@ -157,4 +157,30 @@ class YoutubeService
             ]);
         }
     }
+
+    /**
+     * @param string $q
+     *
+     * @return \App\Http\Response\ApiResponse
+     */
+    public function suggest(string $q): ApiResponse
+    {
+        if (!trim($q)) {
+            return new ResponseError();
+        }
+        $time = (string)(time() * 1000);
+        $url = "https://suggestqueries.google.com/complete/search?json=suggestCallBack&q={$q}&hl=vi&ds=yt&client=youtube&_={$time}";
+        $body = Http::withHeaders([
+            'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
+            'accept-language' => 'vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5'
+        ])->get($url)->json();
+
+        if (!is_array($body) || !$data = Arr::get($body, 1)) {
+            return new ResponseError();
+        }
+
+        return new ResponseSuccess([
+            'list' => $data
+        ]);
+    }
 }

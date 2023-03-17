@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\EStatusApi;
+use App\Http\Response\ResponseError;
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 
 class Authenticate extends Middleware
@@ -14,8 +16,8 @@ class Authenticate extends Middleware
      */
     protected function redirectTo($request)
     {
-        if (! $request->expectsJson()) {
-            return route('login');
+        if ($request->expectsJson()) {
+            return response()->json((new ResponseError(EStatusApi::AUTHENTICATION->value,"Authentication !")));
         }
     }
 }

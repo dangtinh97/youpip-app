@@ -22,7 +22,7 @@ class ApiResponse implements CanRespond
         return [
             'status' => $this->status,
             'content' => $this->content,
-            'data' => $this->data
+            'data' => (object)$this->data
         ];
     }
 }

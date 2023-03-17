@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\YoutubeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,9 +21,15 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-Route::controller(\App\Http\Controllers\Api\YoutubeController::class)
+Route::controller(YoutubeController::class)
     ->prefix('youtube')
+    ->middleware('api')
     ->group(function (){
         Route::get('/new','videoNew');
         Route::get('/link-video','linkVideo');
+    });
+
+Route::controller(AuthController::class)
+    ->group(function (){
+        Route::post('/login','attempt');
     });

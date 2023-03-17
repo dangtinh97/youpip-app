@@ -13,7 +13,8 @@
         "laravel/framework": "^8.75",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
-        "tymon/jwt-auth": "^1.0@dev"
+        "tymon/jwt-auth": "^1.0@dev",
+      "ext-mongodb": "*"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

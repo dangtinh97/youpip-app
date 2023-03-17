@@ -125,4 +125,15 @@ class BaseRepository
             ]);
         });
     }
+
+    /**
+     * @param array $cond
+     * @param array $data
+     *
+     * @return int
+     */
+    public function update(array $cond,array $data): int
+    {
+        return $this->model::query()->where($cond)->update($data);
+    }
 }

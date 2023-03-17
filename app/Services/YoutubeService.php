@@ -6,17 +6,26 @@ use App\Enums\ELinkYoutube;
 use App\Http\Response\ApiResponse;
 use App\Http\Response\ResponseError;
 use App\Http\Response\ResponseSuccess;
+use App\Models\User;
 use App\Repositories\VideoRepository;
+use App\Repositories\ViewRepository;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use MongoDB\BSON\UTCDateTime;
 use YouTube\Exception\YouTubeException;
 use YouTube\YouTubeDownloader;
 
 class YoutubeService
 {
-
-    public function __construct(protected readonly VideoRepository $videoRepository){
-
+    /**
+     * @param \App\Repositories\VideoRepository $videoRepository
+     * @param \App\Repositories\ViewRepository  $viewRepository
+     */
+    public function __construct(
+        protected readonly VideoRepository $videoRepository,
+        protected readonly ViewRepository $viewRepository
+    ) {
     }
 
     /**
@@ -48,7 +57,7 @@ class YoutubeService
             }
             $publishTime = (string)Arr::get($videoRender, 'publishedTimeText.simpleText');
             $timeText = (string)Arr::get($videoRender, 'lengthText.simpleText');
-            if(!$publishTime || !$timeText) {
+            if (!$publishTime || !$timeText) {
                 continue;
             }
             $output[] = [
@@ -79,22 +88,46 @@ class YoutubeService
      */
     function linkVideo(string $videoId): ApiResponse
     {
+        /** @var User $user */
+        $user = Auth::user();
         $youtube = new YouTubeDownloader();
         $url = ELinkYoutube::BASE_URL->value."/watch?v={$videoId}";
         $output = [];
         try {
             $downloadOptions = $youtube->getDownloadLinks($url);
             /** @var array $combine */
-            if(!$combine = $downloadOptions->getCombinedFormats()){
+            if (!$combine = $downloadOptions->getCombinedFormats()) {
                 return new ResponseError();
             }
             /** @var \YouTube\Models\StreamFormat $last */
             $last = Arr::last($combine);
+
+            $url = $last->url;
+            preg_match("/expire=(.*?)&/", $url, $matches);
+            $timeExpire = (int)$matches[1];
+
             $output = [
                 'mime_type' => $last->mimeType,
                 'url' => $last->url,
                 'quality' => $last->quality
             ];
+
+            $this->viewRepository->findAndModify([
+                'video_id' => $videoId,
+                'user_id' => $user->id
+            ], [
+                '$inc' => [
+                    'count' => 1
+                ]
+            ]);
+
+            $this->videoRepository->update([
+                'video_id' => $videoId,
+            ], [
+                'video_play' => array_merge($output, [
+                    'time_expire' => new UTCDateTime($timeExpire * 1000)
+                ])
+            ]);
         } catch (YouTubeException $e) {
         }
 
@@ -106,13 +139,12 @@ class YoutubeService
      *
      * @return void
      */
-    private function saveVideo(array $videos):void
+    private function saveVideo(array $videos): void
     {
-        foreach ($videos as $video){
-
+        foreach ($videos as $video) {
             $this->videoRepository->findAndModify([
                 'video_id' => $video['video_id'] ?? ''
-            ],[
+            ], [
                 '$set' => [
                     'thumbnail' => $video['thumbnail'] ?? '',
                     'title' => $video['title'] ?? '',

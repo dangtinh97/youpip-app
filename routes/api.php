@@ -23,7 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::controller(YoutubeController::class)
     ->prefix('youtube')
-    ->middleware('api')
+    ->middleware('auth')
     ->group(function (){
         Route::get('/new','videoNew');
         Route::get('/link-video','linkVideo');

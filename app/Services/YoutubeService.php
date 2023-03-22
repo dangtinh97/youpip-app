@@ -126,6 +126,9 @@ class YoutubeService
             ], [
                 '$inc' => [
                     'count' => 1
+                ],
+                '$set' => [
+                    'updated_at' => new UTCDateTime()
                 ]
             ]);
 

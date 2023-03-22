@@ -7,12 +7,12 @@ use App\Http\Response\ApiResponse;
 use App\Http\Response\ResponseError;
 use App\Http\Response\ResponseSuccess;
 use App\Models\User;
+use App\Repositories\LogRepository;
 use App\Repositories\VideoRepository;
 use App\Repositories\ViewRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
 use MongoDB\BSON\UTCDateTime;
 use YouTube\Exception\YouTubeException;
 use YouTube\YouTubeDownloader;
@@ -22,10 +22,12 @@ class YoutubeService
     /**
      * @param \App\Repositories\VideoRepository $videoRepository
      * @param \App\Repositories\ViewRepository  $viewRepository
+     * @param \App\Repositories\LogRepository   $logRepository
      */
     public function __construct(
         protected readonly VideoRepository $videoRepository,
-        protected readonly ViewRepository $viewRepository
+        protected readonly ViewRepository $viewRepository,
+        protected readonly LogRepository $logRepository
     ) {
     }
 
@@ -90,6 +92,7 @@ class YoutubeService
      * @param string $videoId
      *
      * @return \App\Http\Response\ApiResponse
+     * @throws \Exception
      */
     function linkVideo(string $videoId): ApiResponse
     {
@@ -102,7 +105,7 @@ class YoutubeService
             $downloadOptions = $youtube->getDownloadLinks($url);
             /** @var array $combine */
             if (!$combine = $downloadOptions->getCombinedFormats()) {
-                return new ResponseError();
+                throw new \Exception("Not find getCombinedFormats link");
             }
             /** @var \YouTube\Models\StreamFormat $last */
             $last = Arr::last($combine);
@@ -134,6 +137,17 @@ class YoutubeService
                 ])
             ]);
         } catch (YouTubeException $e) {
+            $this->logRepository->create([
+                'type' => 'DEBUG',
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'message' => $e->getMessage(),
+                'data' => [
+                    'video_id' => $videoId
+                ]
+            ]);
+
+            return new ResponseError();
         }
 
         return !$output ? new ResponseError() : new ResponseSuccess($output);

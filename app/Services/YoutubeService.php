@@ -40,10 +40,7 @@ class YoutubeService
     {
         $url = ELinkYoutube::BASE_URL->value.'/index?gl=VN';
 
-        $body = Http::withHeaders([
-            'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
-            'accept-language' => 'vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5'
-        ])->get($url)->body();
+        $body = Http::withHeaders($this->headerCountryCode())->get($url)->body();
         preg_match('/var ytInitialData =(.*?);</i', $body, $matches);
         if (count($matches) !== 2) {
             return new ResponseSuccess();
@@ -59,7 +56,7 @@ class YoutubeService
         foreach ($contents as $content) {
             /** @var array $content */
             $videoRender = (array)Arr::get($content, 'richItemRenderer.content.videoRenderer');
-            if (!is_array($videoRender) || !$videoId = Arr::get($videoRender, 'videoId')) {
+            if (!$videoId = Arr::get($videoRender, 'videoId')) {
                 continue;
             }
             $publishTime = (string)Arr::get($videoRender, 'publishedTimeText.simpleText');
@@ -192,10 +189,7 @@ class YoutubeService
         }
         $time = (string)(time() * 1000);
         $url = "https://suggestqueries.google.com/complete/search?json=suggestCallBack&q={$q}&hl=vi&ds=yt&client=youtube&_={$time}";
-        $body = Http::withHeaders([
-            'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
-            'accept-language' => 'vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5'
-        ])->get($url)->json();
+        $body = Http::withHeaders($this->headerCountryCode())->get($url)->json();
 
         if (!is_array($body) || !$data = Arr::get($body, 1)) {
             return new ResponseError();
@@ -219,10 +213,7 @@ class YoutubeService
         $q = str_replace(" ", '+', $q);
         $url = ELinkYoutube::BASE_URL->value."/results?search_query={$q}&gl=VN";
 
-        $body = Http::withHeaders([
-            'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
-            'accept-language' => 'vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5'
-        ])->get($url)->body();
+        $body = Http::withHeaders($this->headerCountryCode())->get($url)->body();
         preg_match('/var ytInitialData =(.*?);</i', $body, $matches);
         if (count($matches) !== 2) {
             return new ResponseError();
@@ -262,5 +253,73 @@ class YoutubeService
             'list' => $output,
             'q' => $q
         ]);
+    }
+
+    /**
+     * @param string $videoId
+     *
+     * @return \App\Http\Response\ApiResponse
+     */
+    public function videoSuggestById(string $videoId): ApiResponse
+    {
+        try{
+            $output = [];
+            if (empty($videoId)) {
+                return $this->listVideo("");
+            }
+            $url = ELinkYoutube::BASE_URL->value."/watch?v=${videoId}";
+            $body = Http::withHeaders($this->headerCountryCode())->get($url)->body();
+            preg_match('/var ytInitialData = (.*?);</i', $body, $matches);
+            $data = json_decode($matches[1], true);
+            $contents = Arr::get($data, 'playerOverlays.playerOverlayRenderer.endScreen.watchNextEndScreenRenderer.results',
+                []);
+
+            foreach ($contents as $content) {
+                /** @var array $content */
+
+                $videoRender = (array)Arr::get($content, 'endScreenVideoRenderer');
+                if (!is_array($videoRender) || !$videoId = Arr::get($videoRender, 'videoId')) {
+                    continue;
+                }
+                $publishTime = (string)Arr::get($videoRender, 'publishedTimeText.simpleText');
+                $timeText = (string)Arr::get($videoRender, 'lengthText.simpleText');
+                if (!$publishTime || !$timeText) {
+                    continue;
+                }
+                $output[] = [
+                    'video_id' => $videoId,
+                    'thumbnail' => (string)Arr::get($videoRender, 'thumbnail.thumbnails.0.url'),
+                    'title' => (string)Arr::get($videoRender, 'title.simpleText'),
+                    'time_text' => $timeText,
+                    'view_count_text' => (string)Arr::get($videoRender, 'shortViewCountText.simpleText'),
+                    'chanel_name' => (string)Arr::get($videoRender, 'shortBylineText.runs.0.text'),
+                    'chanel_url' => (string)Arr::get($videoRender,
+                        'shortBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl'),
+                    'published_time' => $publishTime
+                ];
+            }
+
+            if(!$output){
+                return new ResponseError();
+            }
+
+            return new ResponseSuccess([
+                'list' => $output,
+                'video_id' => $videoId
+            ]);
+        }catch (\Exception $exception){
+            return new ResponseError();
+        }
+    }
+
+    /**
+     * @return string[]
+     */
+    private function headerCountryCode(): array
+    {
+        return [
+            'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
+            'accept-language' => 'vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5'
+        ];
     }
 }

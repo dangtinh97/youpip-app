@@ -257,7 +257,7 @@ class YoutubeService
                 'published_time' => $publishTime
             ];
         }
-
+        $this->saveVideo($output);
         return new ResponseSuccess([
             'list' => $output,
             'q' => $q

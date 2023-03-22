@@ -270,14 +270,19 @@ class YoutubeService
             $url = ELinkYoutube::BASE_URL->value."/watch?v=${videoId}";
             $body = Http::withHeaders($this->headerCountryCode())->get($url)->body();
             preg_match('/var ytInitialData = (.*?);</i', $body, $matches);
-            $data = json_decode($matches[1], true);
-            $contents = Arr::get($data, 'playerOverlays.playerOverlayRenderer.endScreen.watchNextEndScreenRenderer.results',
-                []);
 
+            $data = json_decode($matches[1], true);
+            $contents = Arr::get($data, 'contents.twoColumnWatchNextResults.secondaryResults.secondaryResults.results',
+                []);
+            $tokenContinue = '';
             foreach ($contents as $content) {
                 /** @var array $content */
 
-                $videoRender = (array)Arr::get($content, 'endScreenVideoRenderer');
+                if($last = Arr::get($content,'continuationItemRenderer')){
+                    $tokenContinue = Arr::get($last,'continuationEndpoint.continuationCommand.token');
+                    continue;
+                }
+                $videoRender = (array)Arr::get($content, 'compactVideoRenderer');
                 if (!is_array($videoRender) || !$videoId = Arr::get($videoRender, 'videoId')) {
                     continue;
                 }
@@ -298,6 +303,8 @@ class YoutubeService
                     'published_time' => $publishTime
                 ];
             }
+
+//            $this->loadMore($body,$tokenContinue);
 
             if(!$output){
                 return new ResponseError();
@@ -322,5 +329,25 @@ class YoutubeService
             'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
             'accept-language' => 'vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5'
         ];
+    }
+
+    private function loadMore(string $body,string $token): array
+    {
+        return [];
+        try{
+            preg_match('/"INNERTUBE_CONTEXT":(.*?),"INNERTUBE_CONTEXT_CLIENT_NAME"/i',$body,$m2);
+            $body = [
+                'content' => json_decode($m2[1],true),
+                'continuation' => $token
+            ];
+
+            $post = Http::post('https://www.youtube.com/youtubei/v1/next?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8&prettyPrint=false');
+
+            dd($body);
+        }catch (\Exception $exception){
+            return [];
+        }
+        return [];
+
     }
 }

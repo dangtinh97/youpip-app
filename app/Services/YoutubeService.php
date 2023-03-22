@@ -302,6 +302,7 @@ class YoutubeService
             if(!$output){
                 return new ResponseError();
             }
+            $this->saveVideo($output);
 
             return new ResponseSuccess([
                 'list' => $output,

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\YoutubeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +31,13 @@ Route::controller(YoutubeController::class)
         Route::get('/suggest','suggest');
         Route::get('/search','search');
         Route::get('/suggest-by-video-id','videoSuggest');
+    });
+
+Route::controller(PostController::class)
+    ->prefix('posts')
+    ->middleware('auth')
+    ->group(function (){
+        Route::get('/','index');
     });
 
 Route::controller(AuthController::class)

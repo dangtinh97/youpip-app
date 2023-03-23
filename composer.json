@@ -6,15 +6,19 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
+        "ext-dom": "*",
+        "ext-mongodb": "*",
+        "ext-simplexml": "*",
         "athlon1600/youtube-downloader": "^3.0",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "jenssegers/mongodb": "^3.8",
+        "kub-at/php-simple-html-dom-parser": "^1.9",
         "laravel/framework": "^8.75",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
-        "tymon/jwt-auth": "^1.0@dev",
-      "ext-mongodb": "*"
+        "sunra/php-simple-html-dom-parser": "^1.5",
+        "tymon/jwt-auth": "^1.0@dev"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

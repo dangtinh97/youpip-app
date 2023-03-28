@@ -2,11 +2,14 @@
 
 namespace App\Services;
 
+use App\Enums\EPostViewMode;
 use App\Http\Response\ApiResponse;
 use App\Http\Response\ResponseError;
 use App\Http\Response\ResponseSuccess;
+use App\Repositories\AttachmentRepository;
 use App\Repositories\PostRepository;
 use DOMDocument;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use KubAT\PhpSimple\HtmlDomParser;
 use MongoDB\BSON\ObjectId;
@@ -16,7 +19,10 @@ use simple_html_dom\simple_html_dom_node;
 
 class PostService
 {
-    public function __construct(protected readonly PostRepository $postRepository)
+    public function __construct(
+        protected readonly PostRepository $postRepository,
+        protected readonly AttachmentRepository $attachmentRepository
+    )
     {
     }
 
@@ -79,5 +85,28 @@ class PostService
             return new ResponseError();
         }
 
+    }
+
+    public function create(string $content,int $attachmentId):ApiResponse
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        /** @var \App\Models\Post $create */
+        $create = $this->postRepository->create([
+            'user_id' => $user->id ,
+            'id' => $this->postRepository->getId(),
+            'content' => $content,
+            'attachment_id' => $attachmentId,
+            'count_action' => [],
+            'view_mode' => EPostViewMode::PUBLIC->value
+        ]);
+        if($attachmentId!=0){
+            $this->attachmentRepository->setUse($attachmentId);
+        }
+
+        return new ResponseSuccess([
+            'post_oid' => $create->_id
+        ]);
     }
 }

@@ -5,6 +5,9 @@ namespace App\Models;
 use App\Enums\EPostViewMode;
 use Jenssegers\Mongodb\Eloquent\Model;
 
+/**
+ * @property string $_id
+ */
 class Post extends Model
 {
     /**
@@ -15,7 +18,7 @@ class Post extends Model
     /**
      * @var string[]
      */
-    protected $fillable = ['user_id','id','title','content','image','count_action','url_detail','view_mode'];
+    protected $fillable = ['user_id','id','content','attachment_id','count_action','view_mode'];
 
     protected $casts = [
         'view_mode' => EPostViewMode::class

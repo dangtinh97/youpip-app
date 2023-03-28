@@ -29,4 +29,18 @@ class PostController extends Controller
 
         return response()->json($data->toArray());
     }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function create(Request $request): JsonResponse
+    {
+        $content = (string)$request->get('content');
+        $image = (int)$request->get('attachment_id');
+        $create = $this->postService->create($content, $image);
+
+        return response()->json($create->toArray());
+    }
 }

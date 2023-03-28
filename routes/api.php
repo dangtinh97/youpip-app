@@ -38,6 +38,7 @@ Route::controller(PostController::class)
     ->middleware('auth')
     ->group(function (){
         Route::get('/','index');
+        Route::post('/','create');
     });
 
 Route::controller(AuthController::class)

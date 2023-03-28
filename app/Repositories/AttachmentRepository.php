@@ -11,4 +11,18 @@ class AttachmentRepository extends BaseRepository
     {
         parent::__construct($model);
     }
+
+    /**
+     * @param int $id
+     *
+     * @return int
+     */
+    public function setUse(int $id): int
+    {
+        return $this->update([
+            'id' => $id,
+        ],[
+            'use' => true
+        ]);
+    }
 }

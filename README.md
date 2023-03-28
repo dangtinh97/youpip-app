@@ -11,3 +11,4 @@
 - ```docker exec -it php_pip```
 - ```php artisan jwt:secret```
 - ```php artisan key:generate```
+- ```php artisan storage:link```

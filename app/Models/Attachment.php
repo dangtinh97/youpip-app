@@ -20,5 +20,5 @@ class Attachment extends Model
     /**
      * @var string[]
      */
-    protected $fillable = ['id', 'disk', 'path', 'use'];
+    protected $fillable = ['id', 'disk', 'path', 'use', 'deleted_at'];
 }

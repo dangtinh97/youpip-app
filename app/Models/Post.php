@@ -4,12 +4,16 @@ namespace App\Models;
 
 use App\Enums\EPostViewMode;
 use Jenssegers\Mongodb\Eloquent\Model;
+use Jenssegers\Mongodb\Eloquent\SoftDeletes;
 
 /**
- * @property string $_id
+ * @property string                    $_id
+ * @property string                    $content
+ * @property \MongoDB\BSON\UTCDateTime $created_at
  */
 class Post extends Model
 {
+    use SoftDeletes;
     /**
      * @var string
      */
@@ -18,7 +22,7 @@ class Post extends Model
     /**
      * @var string[]
      */
-    protected $fillable = ['user_id','id','content','attachment_id','count_action','view_mode'];
+    protected $fillable = ['user_id','id','content','attachment_id','count_action','view_mode','deleted_at'];
 
     protected $casts = [
         'view_mode' => EPostViewMode::class

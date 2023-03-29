@@ -21,11 +21,11 @@ class PostController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $lastPostOid = (string)$request->get('post_oid');
+        $lastPostOid = (string)$request->get('post_last_oid');
         if (!StrHelper::isObjectId($lastPostOid)) {
-            $lastPostOid = '';
+            $lastPostOid = null;
         }
-        $data = $this->postService->crawlData();
+        $data = $this->postService->index($lastPostOid,null);
 
         return response()->json($data->toArray());
     }

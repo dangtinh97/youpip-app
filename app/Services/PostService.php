@@ -283,6 +283,43 @@ class PostService
             'user_id' => $user->id
         ]);
 
+        $this->postRepository->findAndModify([
+            'id' => $post->id
+        ],[
+            '$inc' => [
+                'count_action.comment' => 1
+            ]
+        ]);
+
         return new ResponseSuccess();
+    }
+
+    /**
+     * @param string      $postOid
+     * @param string|null $lastCommentOid
+     *
+     * @return \App\Http\Response\ApiResponse
+     */
+    public function listComment(string $postOid, ?string $lastCommentOid): ApiResponse
+    {
+        /** @var \App\Models\Post $post */
+        $post = $this->postRepository->first([
+            '_id' => new ObjectId($postOid)
+        ]);
+        $comments = $this->postActionRepository->comment($post->id, $lastCommentOid);
+
+        $maps = $comments->map(function ($comment) {
+            /** @var \App\Models\PostAction $comment */
+            return [
+                "content" => $comment->content ?? '',
+                "user_id" => $comment->user_id,
+                "full_name" => $comment->getAttribute('full_name') ?? 'Người dùng',
+                "action_oid" => $comment->_id,
+            ];
+        });
+
+        return new ResponseSuccess([
+            'list' => $maps->toArray()
+        ]);
     }
 }

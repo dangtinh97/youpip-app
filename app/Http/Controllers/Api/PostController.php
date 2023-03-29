@@ -71,4 +71,22 @@ class PostController extends Controller
 
         return response()->json($comment->toArray());
     }
+
+    /**
+     * @param string                   $id
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function listComment(string $id, Request $request): JsonResponse
+    {
+        $lastOid = (string)$request->get('last_comment_oid', '');
+        if (!StrHelper::isObjectId($lastOid)) {
+            $lastOid = null;
+        }
+
+        $comments = $this->postService->listComment($id, $lastOid);
+
+        return response()->json($comments->toArray());
+    }
 }

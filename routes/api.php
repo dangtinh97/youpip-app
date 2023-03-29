@@ -41,6 +41,7 @@ Route::controller(PostController::class)
         Route::post('/','create');
         Route::post("/{id}/reaction",'reaction');
         Route::post("/{id}/comment",'comment');
+        Route::get("/{id}/comment",'listComment');
     });
 
 Route::controller(AuthController::class)

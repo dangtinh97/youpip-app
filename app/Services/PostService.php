@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\EPostViewMode;
+use App\Enums\EStatusApi;
 use App\Http\Response\ApiResponse;
 use App\Http\Response\ResponseError;
 use App\Http\Response\ResponseSuccess;
@@ -115,6 +116,10 @@ class PostService
                     'time_published' => date('Y-m-d H:i:s',$datePublished->toDateTime()->getTimestamp()),
                     'post_oid' => (string)(new ObjectId())
                 ];
+            }
+
+            if(count($output)===0){
+                return new ResponseError(EStatusApi::NO_CONTENT->value);
             }
 
             return new ResponseSuccess([

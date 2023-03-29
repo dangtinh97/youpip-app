@@ -44,10 +44,11 @@ class PostService
             }else{
                 $image = $index<count($imagesData)? $imagesData[$index] : $imagesData[0];
             }
+            $userName = $post->users ?? [];
 
             return [
-                'user_id' => 8,
-                'full_name' => 'VnExpress',
+                'user_id' => $post->user_id,
+                'full_name' => Arr::get($userName,'0.full_name','Người dùng'),
                 'image' => $image,
                 'content' => $post->content,
                 'post_oid' => (string)(new ObjectId()),

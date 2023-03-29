@@ -44,6 +44,14 @@ class PostRepository extends BaseRepository
                 ]
             ],
             [
+                '$lookup' => [
+                    'from' => 'users',
+                    'localField' => 'user_id',
+                    'foreignField' => 'id',
+                    'as' => 'users'
+                ],
+            ],
+            [
                 '$sort' => [
                     'id' => -1
                 ]

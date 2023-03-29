@@ -10,7 +10,8 @@ use Jenssegers\Mongodb\Eloquent\SoftDeletes;
  * @property string                    $_id
  * @property string                    $content
  * @property \MongoDB\BSON\UTCDateTime $created_at
- * @property int                     $user_id
+ * @property int                       $user_id
+ * @property int                       $id
  */
 class Post extends Model
 {

@@ -51,11 +51,12 @@ class PostService
                 'full_name' => Arr::get($userName,'0.full_name','Người dùng'),
                 'image' => $image,
                 'content' => $post->content,
-                'post_oid' => (string)(new ObjectId()),
+                'post_oid' => $post->_id,
                 'time' => date($post->created_at),
                 'total_comment' => Arr::get($countAction,'comment',0),
                 'total_like' => Arr::get($countAction,'like',0),
-                'liked' => false
+                'liked' => false,
+                'post_id' => $post->id
             ];
 
         });

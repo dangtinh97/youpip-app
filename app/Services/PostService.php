@@ -62,7 +62,6 @@ class PostService
                 'liked' => false,
                 'post_id' => $post->id
             ];
-
         });
         if($maps->isEmpty()){
             return new ResponseError(EStatusApi::NO_CONTENT->value);

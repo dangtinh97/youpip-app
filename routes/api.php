@@ -39,6 +39,7 @@ Route::controller(PostController::class)
     ->group(function (){
         Route::get('/','index');
         Route::post('/','create');
+        Route::post("/{id}/reaction",'reaction');
     });
 
 Route::controller(AuthController::class)

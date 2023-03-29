@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\EActionPost;
 use App\Helper\StrHelper;
 use App\Http\Controllers\Controller;
 use App\Services\PostService;
@@ -42,5 +43,19 @@ class PostController extends Controller
         $create = $this->postService->create($content, $image);
 
         return response()->json($create->toArray());
+    }
+
+    /**
+     * @param string                   $id
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function reaction(string $id, Request $request): JsonResponse
+    {
+        $reaction = (string)$request->get('action', EActionPost::LIKE->value);
+        $action = $this->postService->reaction($id, $reaction);
+
+        return response()->json($action->toArray());
     }
 }

@@ -2,12 +2,14 @@
 
 namespace App\Services;
 
+use App\Enums\EActionPost;
 use App\Enums\EPostViewMode;
 use App\Enums\EStatusApi;
 use App\Http\Response\ApiResponse;
 use App\Http\Response\ResponseError;
 use App\Http\Response\ResponseSuccess;
 use App\Repositories\AttachmentRepository;
+use App\Repositories\PostActionRepository;
 use App\Repositories\PostRepository;
 use DOMDocument;
 use Illuminate\Support\Arr;
@@ -24,7 +26,8 @@ class PostService
 {
     public function __construct(
         protected readonly PostRepository $postRepository,
-        protected readonly AttachmentRepository $attachmentRepository
+        protected readonly AttachmentRepository $attachmentRepository,
+        protected readonly PostActionRepository $postActionRepository
     )
     {
     }
@@ -70,11 +73,6 @@ class PostService
     public function crawlData(){
         $imagesData = ['https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-1.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-2.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-3.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-4.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-5.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-6.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-7.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-8.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-9.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-10.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-11.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-12.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-13.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-14.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-15.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-16.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-17.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-18.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-19.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-20.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-21.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-22.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-23.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-24.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-25.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-26-scaled.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-27.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-28.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-29.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-30.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-31-scaled.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-32-scaled.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-33.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-34.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-35-scaled.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-36-scaled.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-37.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-son-doong-34.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-son-doong-36.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-son-doong-2.png','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-son-doong-17.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-son-doong-21.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-son-doong-4.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-dep-hoi-an-4.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-dep-hoi-an-6.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-nha-trang-3.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-nha-trang-8.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-mien-tay-song-nuoc-6.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-mien-tay-song-nuoc-33.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-mien-tay-song-nuoc-13.jpg','https://wall.vn/wp-content/uploads/2020/04/tai-anh-sapa.jpg'];
         shuffle($imagesData);
-
-
-
-
-
         try{
             $url = 'https://vnexpress.net/tin-tuc-24h';
             $body = Http::get($url)->body();
@@ -143,7 +141,11 @@ class PostService
             'id' => $this->postRepository->getId(),
             'content' => $content,
             'attachment_id' => $attachmentId,
-            'count_action' => [],
+            'count_action' => [
+                'like' => 0,
+                'comment' => 0,
+                'view' => 0
+            ],
             'view_mode' => EPostViewMode::PUBLIC->value
         ]);
         if($attachmentId!=0){
@@ -153,5 +155,53 @@ class PostService
         return new ResponseSuccess([
             'post_oid' => $create->_id
         ]);
+    }
+
+    /**
+     * @param string $postOid
+     * @param string $action
+     *
+     * @return \App\Http\Response\ApiResponse
+     */
+    public function reaction(string $postOid, string $action): ApiResponse
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $update = [];
+
+        /** @var \App\Models\Post $post */
+        $post = $this->postRepository->first([
+            '_id' => new ObjectId($postOid)
+        ]);
+
+        if ($action === EActionPost::DISLIKE->value) {
+            $d = $this->postActionRepository->deleteWhere([
+                'post_id' => $post->id,
+                'type' => EActionPost::TYPE_ACTION_REACTION->value,
+                'user_id' => $user->id
+            ]);
+            $update = [
+                '$inc' => [
+                    'count_action.like' => -1
+                ]
+            ];
+        } else {
+            $this->postActionRepository->create([
+                'post_id' => $post->id,
+                'type' => EActionPost::TYPE_ACTION_REACTION->value,
+                'user_id' => $user->id
+            ]);
+            $update = [
+                '$inc' => [
+                    'count_action.like' => 1
+                ]
+            ];
+        }
+
+        $this->postRepository->findAndModify([
+            '_id' => new ObjectId($postOid)
+        ], $update);
+
+        return new ResponseSuccess();
     }
 }

@@ -64,7 +64,9 @@ class PostService
             ];
 
         });
-
+        if($maps->isEmpty()){
+            return new ResponseError(EStatusApi::NO_CONTENT->value);
+        }
         return new ResponseSuccess([
             'list' => $maps->toArray()
         ]);
@@ -115,10 +117,7 @@ class PostService
                     'post_oid' => (string)(new ObjectId())
                 ];
             }
-
-            if(count($output)===0){
-                return new ResponseError(EStatusApi::NO_CONTENT->value);
-            }
+            dd(count($output));
 
             return new ResponseSuccess([
                 'list' => $output

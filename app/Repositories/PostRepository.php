@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Enums\EActionPost;
 use App\Models\Post;
 use Illuminate\Database\Eloquent\Collection;
 use Jenssegers\Mongodb\Eloquent\Model;
@@ -20,7 +21,7 @@ class PostRepository extends BaseRepository
      *
      * @return Collection
      */
-    public function index(?string $lastOid, ?int $userId): Collection
+    public function index(?string $lastOid, ?int $userId,int $userIdAction): Collection
     {
         $match = [
             'deleted_at' => null,
@@ -50,6 +51,32 @@ class PostRepository extends BaseRepository
                     'foreignField' => 'id',
                     'as' => 'users'
                 ],
+            ],
+            [
+                '$lookup' => [
+                    'from' => 'post_actions',
+                    'let' => ['post_id' => '$id'],
+                    'pipeline' => [
+                        [
+                            '$match' => [
+                                '$expr' => [
+                                    '$and' => [
+                                        [
+                                            '$eq' => ['$post_id','$$post_id']
+                                        ],
+                                        [
+                                            '$eq' => ['$user_id',$userIdAction]
+                                        ],
+                                        [
+                                            '$eq' => ['$type',EActionPost::TYPE_ACTION_REACTION->value]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'as' => 'actions'
+                ]
             ],
             [
                 '$sort' => [

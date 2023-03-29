@@ -40,6 +40,7 @@ Route::controller(PostController::class)
         Route::get('/','index');
         Route::post('/','create');
         Route::post("/{id}/reaction",'reaction');
+        Route::post("/{id}/comment",'comment');
     });
 
 Route::controller(AuthController::class)

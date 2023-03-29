@@ -58,4 +58,17 @@ class PostController extends Controller
 
         return response()->json($action->toArray());
     }
+
+    /**
+     * @param string                   $id
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function comment(string $id, Request $request): JsonResponse
+    {
+        $comment = $this->postService->comment((string)$request->get('content'), $id);
+
+        return response()->json($comment->toArray());
+    }
 }

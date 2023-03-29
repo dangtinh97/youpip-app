@@ -11,7 +11,6 @@ use App\Http\Response\ResponseSuccess;
 use App\Repositories\AttachmentRepository;
 use App\Repositories\PostActionRepository;
 use App\Repositories\PostRepository;
-use DOMDocument;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -32,42 +31,100 @@ class PostService
     {
     }
 
-    public function index(?string $lastOid,?int $userId):ApiResponse
+    /**
+     * @param string|null $lastOid
+     * @param int|null    $userId
+     *
+     * @return \App\Http\Response\ApiResponse
+     */
+    public function index(?string $lastOid, ?int $userId): ApiResponse
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        $posts =$this->postRepository->index($lastOid,$userId,$user->id);
-        $imagesData = ['https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-1.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-2.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-3.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-4.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-5.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-6.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-7.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-8.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-9.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-10.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-11.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-12.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-13.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-14.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-15.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-16.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-17.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-18.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-19.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-20.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-21.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-22.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-23.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-24.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-25.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-26-scaled.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-27.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-28.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-29.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-30.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-31-scaled.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-32-scaled.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-33.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-34.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-35-scaled.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-36-scaled.jpg','https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-37.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-son-doong-34.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-son-doong-36.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-son-doong-2.png','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-son-doong-17.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-son-doong-21.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-son-doong-4.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-dep-hoi-an-4.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-dep-hoi-an-6.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-nha-trang-3.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-nha-trang-8.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-mien-tay-song-nuoc-6.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-mien-tay-song-nuoc-33.jpg','https://wall.vn/wp-content/uploads/2020/04/hinh-anh-mien-tay-song-nuoc-13.jpg','https://wall.vn/wp-content/uploads/2020/04/tai-anh-sapa.jpg'];
+        $posts = $this->postRepository->index($lastOid, $userId, $user->id);
+        $imagesData = [
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-1.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-2.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-3.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-4.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-5.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-6.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-7.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-8.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-9.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-10.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-11.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-12.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-13.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-14.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-15.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-16.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-17.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-18.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-19.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-20.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-21.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-22.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-23.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-24.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-25.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-26-scaled.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-27.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-28.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-29.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-30.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-31-scaled.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-32-scaled.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-33.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-34.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-35-scaled.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-36-scaled.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/anh-dep-viet-nam-37.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/hinh-anh-son-doong-34.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/hinh-anh-son-doong-36.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/hinh-anh-son-doong-2.png',
+            'https://wall.vn/wp-content/uploads/2020/04/hinh-anh-son-doong-17.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/hinh-anh-son-doong-21.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/hinh-anh-son-doong-4.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/hinh-anh-dep-hoi-an-4.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/hinh-anh-dep-hoi-an-6.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/hinh-anh-nha-trang-3.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/hinh-anh-nha-trang-8.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/hinh-anh-mien-tay-song-nuoc-6.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/hinh-anh-mien-tay-song-nuoc-33.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/hinh-anh-mien-tay-song-nuoc-13.jpg',
+            'https://wall.vn/wp-content/uploads/2020/04/tai-anh-sapa.jpg'
+        ];
         shuffle($imagesData);
-        $maps = $posts->map(function ($post,$index) use ($imagesData){
+        $maps = $posts->map(function ($post, $index) use ($imagesData) {
             /** @var \App\Models\Post $post */
 
             $countAction = $post->count_action ?? [];
 
-            if($images =$post->getAttribute('image')){
+            if ($images = $post->getAttribute('image')) {
                 $image = Storage::disk($images[0]['disk'])->url($images[0]['path']);
-
-            }else{
-                $image = $index<count($imagesData)? $imagesData[$index] : $imagesData[0];
+            } else {
+                $image = $index < count($imagesData) ? $imagesData[$index] : $imagesData[0];
             }
             $userName = $post->users ?? [];
 
             return [
                 'user_id' => $post->user_id,
-                'full_name' => Arr::get($userName,'0.full_name','Người dùng'),
+                'full_name' => Arr::get($userName, '0.full_name', 'Người dùng'),
                 'image' => $image,
                 'content' => $post->content,
                 'post_oid' => $post->_id,
                 'time' => date($post->created_at),
-                'total_comment' => Arr::get($countAction,'comment',0),
-                'total_like' => Arr::get($countAction,'like',0),
-                'liked' => count($post->getAttribute('actions'))>0,
+                'total_comment' => Arr::get($countAction, 'comment', 0),
+                'total_like' => Arr::get($countAction, 'like', 0),
+                'liked' => count($post->getAttribute('actions')) > 0,
                 'post_id' => $post->id
             ];
         });
-        if($maps->isEmpty()){
+        if ($maps->isEmpty()) {
             return new ResponseError(EStatusApi::NO_CONTENT->value);
         }
+
         return new ResponseSuccess([
             'list' => $maps->toArray()
         ]);
@@ -201,6 +258,30 @@ class PostService
         $this->postRepository->findAndModify([
             '_id' => new ObjectId($postOid)
         ], $update);
+
+        return new ResponseSuccess();
+    }
+
+    /**
+     * @param string $content
+     * @param string $postOid
+     *
+     * @return \App\Http\Response\ApiResponse
+     */
+    public function comment(string $content, string $postOid): ApiResponse
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        /** @var \App\Models\Post $post */
+        $post = $this->postRepository->first([
+            '_id' => new ObjectId($postOid)
+        ]);
+        $this->postActionRepository->create([
+            'type' => EActionPost::TYPE_ACTION_COMMENT->value,
+            'content' => $content,
+            'post_id' => $post->id,
+            'user_id' => $user->id
+        ]);
 
         return new ResponseSuccess();
     }

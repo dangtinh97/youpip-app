@@ -54,6 +54,7 @@ class PostService
                 'time' => date($post->created_at),
                 'total_comment' => Arr::get($countAction,'comment',0),
                 'total_like' => Arr::get($countAction,'like',0),
+                'liked' => false
             ];
 
         });

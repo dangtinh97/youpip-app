@@ -157,9 +157,11 @@ class ChatService
         $maps = $data->map(function ($item) use ($user){
             /** @var Room $item */
 
+
+            $users = collect($item->getAttribute('users'));
+
             $last = $item->last_message ?? [];
             $userId = $user->id;
-            ;
             $fromUserId = Arr::get($last,'user_id');
             $message = ($fromUserId==$userId ? 'Bạn: ' : ''). Arr::get($last,'message');
 
@@ -172,7 +174,8 @@ class ChatService
                 'room_oid' => $item->_id,
                 'time' => $time ?? '',
                 'message' => $message,
-                'user_id' => $fromUserId ?? 0
+                'user_id' => $fromUserId ?? 0,
+                'full_name' => $users->where('id','!=',$userId)->first()['full_name'] ?? 'Người dùng'
             ];
         });
 

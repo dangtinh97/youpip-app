@@ -9,6 +9,7 @@ use App\Http\Response\ResponseError;
 use App\Http\Response\ResponseSuccess;
 use App\Models\Room;
 use App\Repositories\ConfigRepository;
+use App\Repositories\LogRepository;
 use App\Repositories\MessageRepository;
 use App\Repositories\RoomRepository;
 use App\Repositories\UserRepository;
@@ -25,7 +26,8 @@ class ChatService
         protected readonly UserRepository $userRepository,
         protected readonly ConfigRepository $configRepository,
         protected readonly RoomRepository $roomRepository,
-        protected readonly MessageRepository $messageRepository
+        protected readonly MessageRepository $messageRepository,
+        protected readonly LogRepository $logRepository
     )
     {
 
@@ -127,6 +129,11 @@ class ChatService
             'model' => 'gpt-3.5-turbo',
             'messages' => $messages
         ])->toArray();
+
+        $this->logRepository->create([
+            'type' => 'OPEN_AI',
+            'data' => $response
+        ]);
 
         $message = Arr::get($response, 'choices.0.message.content');
 

@@ -1,0 +1,200 @@
+<?php
+
+namespace App\Services;
+
+use App\Enums\EStatusApi;
+use App\Enums\ETypeMessage;
+use App\Http\Response\ApiResponse;
+use App\Http\Response\ResponseError;
+use App\Http\Response\ResponseSuccess;
+use App\Models\Room;
+use App\Repositories\ConfigRepository;
+use App\Repositories\MessageRepository;
+use App\Repositories\RoomRepository;
+use App\Repositories\UserRepository;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\UTCDateTime;
+use OpenAI;
+
+class ChatService
+{
+    public function __construct(
+        protected readonly UserRepository $userRepository,
+        protected readonly ConfigRepository $configRepository,
+        protected readonly RoomRepository $roomRepository,
+        protected readonly MessageRepository $messageRepository
+    )
+    {
+    }
+
+    /**
+     * @param string $roomOid
+     * @param string $message
+     *
+     * @return \App\Http\Response\ApiResponse
+     */
+    public function sendMessage(string $roomOid, string $message): ApiResponse
+    {
+        /** @var Room $room */
+        $room = $this->roomRepository->first([
+            '_id' => new ObjectId($roomOid)
+        ]);
+        $joins = $room->join;
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $userId = $user->id;
+
+        if (($key = array_search($userId, $joins)) !== false) {
+            unset($joins[$key]);
+        }
+
+        $toUserId = array_values($joins)[0];
+
+        /** @var \App\Models\User $withUser */
+        $withUser = $this->userRepository->first([
+            'id' => $toUserId
+        ]);
+
+        /** @var \App\Models\Message $create */
+        $create = $this->messageRepository->create([
+            'room_id' => $room->id,
+            'from_user_id' => $userId,
+            'message' => $message,
+            'type' => ETypeMessage::ONLY_TEXT->value,
+        ]);
+        if ($withUser->username === 'OPEN_AI') {
+            $message = $this->chatGpt($room->id, $message, $userId, $withUser->id);
+        }
+
+        return new ResponseSuccess([
+            'message_oid' => $create->_id,
+            'message' => $message
+        ]);
+    }
+
+    /**
+     * @param int    $roomId
+     * @param string $messsage
+     * @param int    $userId
+     * @param int    $botId
+     *
+     * @return string
+     */
+    public function chatGpt(int $roomId, string $messsage, int $userId, int $botId): string
+    {
+        /** @var \App\Models\Config $config */
+        $config = $this->configRepository->first([
+            'type' => 'OPENAI'
+        ]);
+        $data = $config->data ?? [];
+        $time = Arr::get($data, 'max_time_wait', 300);
+
+        $find = $this->messageRepository->find([
+            'room_id' => $roomId,
+            'created_at' => [
+                '$gt' => new UTCDateTime((time() - $time) * 1000)
+            ]
+        ]);
+        $messages = $find->map(function ($item) use ($userId) {
+            /** @var \App\Models\Message $item */
+            $role = $item->from_user_id !== $userId ? "assistant" : "user";
+
+            return [
+                'role' => $role,
+                'content' => $item->message
+            ];
+        })->toArray();
+        $key = env('OPENAI_KEY', '');
+        $client = OpenAI::client($key);
+        $response = $client->chat()->create([
+            'model' => 'gpt-3.5-turbo',
+            'messages' => $messages
+        ])->toArray();
+
+        $message = Arr::get($response, 'choices.0.message.content');
+
+        if ($message) {
+            $this->messageRepository->create([
+                'room_id' => $roomId,
+                'from_user_id' => $botId,
+                'message' => $message,
+                'type' => ETypeMessage::ONLY_TEXT->value,
+            ]);
+        }
+
+        return $message ?? "Tôi đang gặp sự cố rồi!";
+    }
+
+    public function listChat(?string $lastOid)
+    {
+
+    }
+
+    /**
+     * @param string $userOid
+     *
+     * @return \App\Http\Response\ApiResponse
+     */
+    public function joinRoom(string $userOid): ApiResponse
+    {
+        /** @var \App\Models\User $userFind */
+        $userFind = $this->userRepository->first([
+            '_id' => new ObjectId($userOid)
+        ]);
+        $withUserId = $userFind->id;
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        /** @var \App\Models\Room|null $room */
+        $room = $this->roomRepository->first([
+            '$or' => [
+                ['join' => [$user->id, $withUserId]],
+                ['join' => [$withUserId, $user->id]]
+            ]
+        ]);
+        if (!$room instanceof Room) {
+            /** @var \App\Models\Room $room */
+            $room = $this->roomRepository->create([
+                'id' => $this->roomRepository->getId(),
+                'user_id_created' => $user->id,
+                'join' => [$user->id, $withUserId],
+                'last_message' => []
+            ]);
+        }
+
+        return new ResponseSuccess([
+            'room_oid' => $room->_id
+        ]);
+    }
+
+    /**
+     * @param string      $roomOid
+     * @param string|null $lastOid
+     *
+     * @return \App\Http\Response\ApiResponse
+     */
+    public function message(string $roomOid, ?string $lastOid): ApiResponse
+    {
+        /** @var \App\Models\Room $room */
+        $room = $this->roomRepository->first([
+            '_id' => $roomOid
+        ]);
+        $roomId = $room->id;
+        $result = $this->messageRepository
+            ->message($roomId, $lastOid)
+            ->map(function ($item) {
+                /** @var \App\Models\Message $item */
+                return [
+                    'from_user_id' => $item->from_user_id,
+                    'message' => $item->message
+                ];
+            })->toArray();
+
+        return new ResponseSuccess([
+            'list' => $result
+        ]);
+    }
+}

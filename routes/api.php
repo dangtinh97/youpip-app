@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\YoutubeController;
 use Illuminate\Http\Request;
@@ -50,3 +51,13 @@ Route::controller(AuthController::class)
     });
 
 Route::post('/attachment',[\App\Http\Controllers\Api\AttachmentController::class,'create'])->middleware('auth');
+
+Route::controller(ChatController::class)
+    ->prefix('/chats')
+    ->middleware('auth')
+    ->group(function (){
+        Route::get("/chat-gpt",'chatGpt');
+        Route::get('/join-room','joinRoom');
+        Route::get('/{id}','message');
+        Route::post('/{id}','sendMessage');
+    });

@@ -101,52 +101,57 @@ class ChatService
      */
     public function chatGpt(int $roomId, int $userId, int $botId): string
     {
-        /** @var \App\Models\Config $config */
-        $config = $this->configRepository->first([
-            'type' => 'OPENAI'
-        ]);
-        $data = $config->data ?? [];
-        $time = Arr::get($data, 'max_time_wait', 300);
-
-        $find = $this->messageRepository->find([
-            'room_id' => $roomId,
-            'created_at' => [
-                '$gt' => new UTCDateTime((time() - $time) * 1000)
-            ]
-        ]);
-        $messages = $find->map(function ($item) use ($userId) {
-            /** @var \App\Models\Message $item */
-            $role = $item->from_user_id !== $userId ? "assistant" : "user";
-
-            return [
-                'role' => $role,
-                'content' => $item->message
-            ];
-        })->toArray();
-        $key = env('OPENAI_KEY', '');
-        $client = OpenAI::client($key);
-        $response = $client->chat()->create([
-            'model' => 'gpt-3.5-turbo',
-            'messages' => $messages
-        ])->toArray();
-
-        $this->logRepository->create([
-            'type' => 'OPEN_AI',
-            'data' => $response
-        ]);
-
-        $message = Arr::get($response, 'choices.0.message.content');
-
-        if ($message) {
-            $this->messageRepository->create([
-                'room_id' => $roomId,
-                'from_user_id' => $botId,
-                'message' => $message,
-                'type' => ETypeMessage::ONLY_TEXT->value,
+        try{
+            /** @var \App\Models\Config $config */
+            $config = $this->configRepository->first([
+                'type' => 'OPENAI'
             ]);
+            $data = $config->data ?? [];
+            $time = Arr::get($data, 'max_time_wait', 300);
+
+            $find = $this->messageRepository->find([
+                'room_id' => $roomId,
+                'created_at' => [
+                    '$gt' => new UTCDateTime((time() - $time) * 1000)
+                ]
+            ]);
+            $messages = $find->map(function ($item) use ($userId) {
+                /** @var \App\Models\Message $item */
+                $role = $item->from_user_id !== $userId ? "assistant" : "user";
+
+                return [
+                    'role' => $role,
+                    'content' => $item->message
+                ];
+            })->toArray();
+            $key = env('OPENAI_KEY', '');
+            $client = OpenAI::client($key);
+            $response = $client->chat()->create([
+                'model' => 'gpt-3.5-turbo',
+                'messages' => $messages
+            ])->toArray();
+
+            $this->logRepository->create([
+                'type' => 'OPEN_AI',
+                'data' => $response
+            ]);
+
+            $message = Arr::get($response, 'choices.0.message.content');
+
+            if ($message) {
+                $this->messageRepository->create([
+                    'room_id' => $roomId,
+                    'from_user_id' => $botId,
+                    'message' => $message,
+                    'type' => ETypeMessage::ONLY_TEXT->value,
+                ]);
+            }
+
+            return $message ?? "Tôi đang gặp sự cố rồi!";
+        }catch (\Exception $exception){
+            return "Tôi đang gặp sự cố rồi!";
         }
 
-        return $message ?? "Tôi đang gặp sự cố rồi!";
     }
 
     public function listChat(?string $lastOid)
@@ -156,7 +161,6 @@ class ChatService
         $data = $this->roomRepository->listChat($user->id,$lastOid);
         $maps = $data->map(function ($item) use ($user){
             /** @var Room $item */
-
 
             $users = collect($item->getAttribute('users'));
 

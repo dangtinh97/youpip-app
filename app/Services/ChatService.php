@@ -125,7 +125,6 @@ class ChatService
                 ];
             })->toArray();
             $key = env('OPENAI_KEY', '');
-
             $keys = explode(",",Arr::get($data,'api_key',$key));
             shuffle($keys);
             $client = OpenAI::client($keys[0] ?? $key);
@@ -136,7 +135,9 @@ class ChatService
 
             $this->logRepository->create([
                 'type' => 'OPEN_AI',
-                'data' => $response
+                'data' => array_merge($response, [
+                    'use_key' => $key
+                ])
             ]);
 
             $message = Arr::get($response, 'choices.0.message.content');
@@ -263,5 +264,18 @@ class ChatService
         return new ResponseSuccess([
             'list' => array_values($result)
         ]);
+    }
+
+    /**
+     * @return string
+     */
+    public function getInfoChatGpt(): string
+    {
+        /** @var \App\Models\User $user */
+        $user = $this->userRepository->first([
+            'username' => 'OPEN_AI'
+        ]);
+
+        return $user->_id;
     }
 }

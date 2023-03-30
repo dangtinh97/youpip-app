@@ -250,11 +250,10 @@ class ChatService
                     'time' => date('H:i:s', $item->created_at->toDateTime()->getTimestamp())
                 ];
             })
-            ->reverse()
             ->toArray();
 
         return new ResponseSuccess([
-            'list' => array_values($result)
+            'list' => $result
         ]);
     }
 }

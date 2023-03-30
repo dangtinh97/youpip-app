@@ -127,7 +127,7 @@ class ChatService
             $key = env('OPENAI_KEY', '');
             $keys = explode(",",Arr::get($data,'api_key',$key));
             shuffle($keys);
-            $client = OpenAI::client($keys[0] ?? $key);
+            $client = OpenAI::client($key = $keys[0] ?? $key);
             $response = $client->chat()->create([
                 'model' => 'gpt-3.5-turbo',
                 'messages' => $messages

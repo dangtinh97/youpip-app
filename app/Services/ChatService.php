@@ -28,6 +28,7 @@ class ChatService
         protected readonly MessageRepository $messageRepository
     )
     {
+
     }
 
     /**
@@ -65,9 +66,22 @@ class ChatService
             'message' => $message,
             'type' => ETypeMessage::ONLY_TEXT->value,
         ]);
+        $endUser = $user->id;
+        $messageSave = $message;
         if ($withUser->username === 'OPEN_AI') {
-            $message = $this->chatGpt($room->id, $message, $userId, $withUser->id);
+            $message = $this->chatGpt($room->id, $userId, $withUser->id);
+            $endUser = $withUser->id;
+            $messageSave = $message;
+        } else {
+            $message = "";
         }
+        $room->update([
+            'last_message' => [
+                'user_id' => $endUser,
+                'message' => $messageSave,
+                'time' => new UTCDateTime()
+            ]
+        ]);
 
         return new ResponseSuccess([
             'message_oid' => $create->_id,
@@ -83,7 +97,7 @@ class ChatService
      *
      * @return string
      */
-    public function chatGpt(int $roomId, string $messsage, int $userId, int $botId): string
+    public function chatGpt(int $roomId, int $userId, int $botId): string
     {
         /** @var \App\Models\Config $config */
         $config = $this->configRepository->first([
@@ -130,7 +144,34 @@ class ChatService
 
     public function listChat(?string $lastOid)
     {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $data = $this->roomRepository->listChat($user->id,$lastOid);
+        $maps = $data->map(function ($item) use ($user){
+            /** @var Room $item */
 
+            $last = $item->last_message ?? [];
+            $userId = $user->id;
+            ;
+            $fromUserId = Arr::get($last,'user_id');
+            $message = ($fromUserId==$userId ? 'Bạn: ' : ''). Arr::get($last,'message');
+
+            /** @var UTCDateTime|null $time */
+            if($time = Arr::get($last,'time')){
+                $time = date('H:i:s',$time->toDateTime()->getTimestamp());
+            }
+
+            return [
+                'room_oid' => $item->_id,
+                'time' => $time ?? '',
+                'message' => $message,
+                'user_id' => $fromUserId ?? 0
+            ];
+        });
+
+        return new ResponseSuccess([
+            'list' => $maps->toArray()
+        ]);
     }
 
     /**

@@ -31,6 +31,11 @@ class ChatController extends Controller
             $lastOid = null;
         }
 
+
+        $listChat = $this->chatService->listChat($lastOid);
+
+        return response()->json($listChat->toArray());
+
     }
 
     /**

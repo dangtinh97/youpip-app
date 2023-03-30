@@ -56,6 +56,7 @@ Route::controller(ChatController::class)
     ->prefix('/chats')
     ->middleware('auth')
     ->group(function (){
+        Route::get('/','listChat');
         Route::get("/chat-gpt",'chatGpt');
         Route::get('/join-room','joinRoom');
         Route::get('/{id}','message');

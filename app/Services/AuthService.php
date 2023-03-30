@@ -52,10 +52,11 @@ class AuthService
     {
         $token = Auth::login($user);
         return new ResponseSuccess([
-            'username' => $user->username,
             '_id' => $user->_id,
-            'token' => $token
+            'username' => $user->username,
+            'user_id' => $user->id,
+            'full_name'=> $user->full_name,
+            'token' => $token,
         ]);
     }
-
 }

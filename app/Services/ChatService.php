@@ -248,7 +248,9 @@ class ChatService
                     'from_me' => $userId === $item->from_user_id,
                     'time' => date('H:i:s', $item->created_at->toDateTime()->getTimestamp())
                 ];
-            })->toArray();
+            })
+            ->reverse()
+            ->toArray();
 
         return new ResponseSuccess([
             'list' => $result

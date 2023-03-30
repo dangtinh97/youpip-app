@@ -243,6 +243,7 @@ class ChatService
             ->map(function ($item) use ($userId) {
                 /** @var \App\Models\Message $item */
                 return [
+                    'message_oid' => $item->_id,
                     'user_id' => $item->from_user_id,
                     'message' => $item->message,
                     'from_me' => $userId === $item->from_user_id,
@@ -253,7 +254,7 @@ class ChatService
             ->toArray();
 
         return new ResponseSuccess([
-            'list' => $result
+            'list' => array_values($result)
         ]);
     }
 }

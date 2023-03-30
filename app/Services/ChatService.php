@@ -229,6 +229,10 @@ class ChatService
      */
     public function message(string $roomOid, ?string $lastOid): ApiResponse
     {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $userId = $user->id;
+
         /** @var \App\Models\Room $room */
         $room = $this->roomRepository->first([
             '_id' => $roomOid
@@ -236,11 +240,13 @@ class ChatService
         $roomId = $room->id;
         $result = $this->messageRepository
             ->message($roomId, $lastOid)
-            ->map(function ($item) {
+            ->map(function ($item) use ($userId) {
                 /** @var \App\Models\Message $item */
                 return [
-                    'from_user_id' => $item->from_user_id,
-                    'message' => $item->message
+                    'user_id' => $item->from_user_id,
+                    'message' => $item->message,
+                    'from_me' => $userId === $item->from_user_id,
+                    'time' => date('H:i:s', $item->created_at->toDateTime()->getTimestamp())
                 ];
             })->toArray();
 

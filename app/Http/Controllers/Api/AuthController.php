@@ -21,6 +21,9 @@ class AuthController extends Controller
     public function attempt(Request $request): JsonResponse
     {
         $username = (string)$request->get('username');
+        if(strlen($username)<10){
+            $username = '';
+        }
         $login = $this->authService->login($username);
 
         return response()->json($login->toArray());

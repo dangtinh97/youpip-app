@@ -29,6 +29,7 @@ class YoutubeController extends Controller
      * @param \Illuminate\Http\Request $request
      *
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
     public function linkVideo(Request $request): JsonResponse
     {

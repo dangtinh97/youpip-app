@@ -39,6 +39,7 @@ class YoutubeService
     public function listVideo(string $token): ApiResponse
     {
         $url = ELinkYoutube::BASE_URL->value.'/index?gl=VN';
+        $url = ELinkYoutube::BASE_URL->value.'/?persist_gl=1&gl=VN';
 
         $body = Http::withHeaders($this->headerCountryCode())->get($url)->body();
         preg_match('/var ytInitialData =(.*?);</i', $body, $matches);
@@ -328,7 +329,7 @@ class YoutubeService
         return [
             'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
 //            'accept-language' => 'vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5',
-            'accept-language' => 'vi-VN,vi;q=1',
+            'accept-language' => 'vi-VN,vi;q=0.9',
         ];
     }
 

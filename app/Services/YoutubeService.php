@@ -38,10 +38,10 @@ class YoutubeService
      */
     public function listVideo(string $token): ApiResponse
     {
-        $url = ELinkYoutube::BASE_URL->value.'/index?gl=VN';
-        $url = ELinkYoutube::BASE_URL->value.'/?persist_gl=1&gl=VN';
+        $url = ELinkYoutube::BASE_URL->value.'/index?gl=VN&hl=vi';
 
-        $body = Http::withHeaders($this->headerCountryCode())->get($url)->body();
+        $body = Http::withHeaders($this->headerCountryCode())
+            ->get($url)->body();
         preg_match('/var ytInitialData =(.*?);</i', $body, $matches);
         if (count($matches) !== 2) {
             return new ResponseSuccess();

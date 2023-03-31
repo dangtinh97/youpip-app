@@ -327,8 +327,8 @@ class YoutubeService
     {
         return [
             'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
-            'accept-language' => 'vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5',
-            'cookie' => 'VISITOR_INFO1_LIVE=rCrrao3ZU0c; __Secure-3PSID=PwjDrmrGRx28gXZVBcoFnHKDS195PSnAiM0UGPpGzGl6zLb3nI7uMNDUDCD56fvSZrY0kg.; __Secure-3PAPISID=e8-JHVzWxfQttYbe/AnE2mByKl_ylGgJVR; __Secure-3PSIDCC=AIKkIs1ZuXq96BlXDgg0vASValBh82XhpWATl3ei3iDyMHBwTK2ulrCf0QFGq64vOA5l88MXWg; DEVICE_INFO=ChxOekU0TnpVM01UUTROalF3TnpFNE5EazVPQT09EK/E/Z0GGK/E/Z0G; PREF=tz=Asia.Saigon&f5=30000&f6=400&f7=100; GPS=1; YSC=bqVHeUR5PAU'
+//            'accept-language' => 'vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5',
+            'accept-language' => 'vi-VN,vi;q=1',
         ];
     }
 

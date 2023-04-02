@@ -74,7 +74,6 @@ class AuthService
         for ($i = 0; $i < self::MAX_SHORT_NAME; $i++) {
             $value = $arrayInt[$i] ?? null;
             if (is_numeric($value)) {
-                var_dump($value, $i);
                 $result .= ($arrayInt[$i]);
             } else {
                 $result .= $chars[$i];

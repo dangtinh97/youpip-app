@@ -26,7 +26,7 @@ class AuthController extends Controller
     {
 
         $username = (string)$request->get('username');
-        if(strlen($username)<10){
+        if(strlen($username)<5){
             $username = '';
         }
         $login = $this->authService->login($username);
@@ -44,4 +44,6 @@ class AuthController extends Controller
         $userOid = $this->chatService->getInfoChatGpt();
         $this->chatService->joinRoom($userOid);
     }
+
+
 }

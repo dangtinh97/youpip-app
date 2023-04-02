@@ -12,9 +12,11 @@ use Illuminate\Support\Str;
 
 class AuthService
 {
+    const MAX_SHORT_NAME = 10;
     public function __construct(protected readonly UserRepository $userRepository)
     {
     }
+
 
     /**
      * @param string $username
@@ -23,6 +25,7 @@ class AuthService
      */
     public function login(string $username): ApiResponse
     {
+
         if (!$username) {
             $username = Str::uuid()->toString();
         }
@@ -33,14 +36,54 @@ class AuthService
         ]);
 
         if (!$user instanceof User) {
+            $id = $this->userRepository->getId();
+
             $user = $this->userRepository->create([
-                'id' => $this->userRepository->getId(),
+                'id' => $id,
+                'short_username' => $this->createShortUserName($id),
                 'username' => $username,
                 'password' => Hash::make((string)time())
             ]);
         }
 
         return $this->user($user);
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return string
+     */
+    private function createShortUserName(int $id): string
+    {
+        $chars = range('A', 'Z');
+        shuffle($chars);
+        $result = "";
+        $arrayFirst = range(0, 9);
+        $keys = [];
+        $values = [];
+        for ($i = 0; $i < strlen($id); $i++) {
+            $pos = array_rand($arrayFirst);
+            $keys[] = $arrayFirst[$pos];
+            $values[] = ((string)$id)[$i];
+            unset($arrayFirst[$pos]);
+        }
+        sort($keys);
+        $arrayInt = array_combine($keys, $values);
+
+        var_dump($arrayInt);
+
+        for ($i = 0; $i < self::MAX_SHORT_NAME; $i++) {
+            $value = $arrayInt[$i] ?? null;
+            if (is_numeric($value)) {
+                var_dump($value, $i);
+                $result .= ($arrayInt[$i]);
+            } else {
+                $result .= $chars[$i];
+            }
+        }
+
+        return $result;
     }
 
     /**

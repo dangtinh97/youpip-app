@@ -71,8 +71,6 @@ class AuthService
         sort($keys);
         $arrayInt = array_combine($keys, $values);
 
-        var_dump($arrayInt);
-
         for ($i = 0; $i < self::MAX_SHORT_NAME; $i++) {
             $value = $arrayInt[$i] ?? null;
             if (is_numeric($value)) {

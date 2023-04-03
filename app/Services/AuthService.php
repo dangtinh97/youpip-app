@@ -95,7 +95,7 @@ class AuthService
             '_id' => $user->_id,
             'username' => $user->username,
             'user_id' => $user->id,
-            'full_name'=> $user->full_name,
+            'full_name'=> $user->full_name ?? '',
             'token' => $token,
             'short_username' => $user->short_username ?? ''
         ]);

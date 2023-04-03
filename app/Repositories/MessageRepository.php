@@ -20,7 +20,7 @@ class MessageRepository extends BaseRepository
      *
      * @return Collection
      */
-    public function message(int $roomId, ?string $lastOid):Collection
+    public function message(int $roomId, ?string $lastOid): Collection
     {
         $cond = [
             'room_id' => $roomId

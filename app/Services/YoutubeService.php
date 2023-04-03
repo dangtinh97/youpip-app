@@ -175,7 +175,7 @@ class YoutubeService
             if(count($thumbs)>0){
                 $update['thumbnail'] = Arr::last($thumbs)['url'];
             }
-            dd($update);
+
             $this->videoRepository->update([
                 'video_id' => $videoId,
             ], $update);

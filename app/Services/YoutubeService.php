@@ -172,9 +172,9 @@ class YoutubeService
                     'time_expire' => new UTCDateTime($timeExpire * 1000)
                 ])
             ];
-            if(count($thumbs)>0){
-                $update['thumbnail'] = Arr::last($thumbs)['url'];
-            }
+//            if(count($thumbs)>0){
+//                $update['thumbnail'] = Arr::last($thumbs)['url'];
+//            }
 
             $this->videoRepository->update([
                 'video_id' => $videoId,

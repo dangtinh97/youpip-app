@@ -12,6 +12,7 @@ use App\Models\Post;
 use App\Repositories\AttachmentRepository;
 use App\Repositories\PostActionRepository;
 use App\Repositories\PostRepository;
+use App\Repositories\UserRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -27,7 +28,8 @@ class PostService
     public function __construct(
         protected readonly PostRepository $postRepository,
         protected readonly AttachmentRepository $attachmentRepository,
-        protected readonly PostActionRepository $postActionRepository
+        protected readonly PostActionRepository $postActionRepository,
+        protected readonly UserRepository $userRepository
     ) {
     }
 
@@ -108,7 +110,11 @@ class PostService
             }
             $userName = $post->users ?? [];
 
+            /** @var ObjectId $userOid */
+            $userOid = Arr::get($userName, '0._id', '');
+
             return [
+                'user_oid'=> $userOid->__toString(),
                 'user_id' => $post->user_id,
                 'full_name' => Arr::get($userName, '0.full_name', Arr::get($userName, '0.short_username', 'Người dùng')),
                 'image' => $image,
@@ -394,5 +400,31 @@ class PostService
         $post->delete();
 
         return new ResponseSuccess();
+    }
+
+    public function detail(string $postOid)
+    {
+        /** @var \App\Models\Post|null $post */
+        $post = $this->postRepository->first([
+            '_id' => new ObjectId($postOid)
+        ]);
+
+        if(!$post instanceof Post){
+            return new ResponseError(EStatusApi::FAIL->value);
+        }
+
+        $userId = $post->user_id;
+        /** @var \App\Models\User $user */
+        $user = $this->userRepository->first([
+            'id' => $userId
+        ]);
+
+
+        return new ResponseSuccess([
+            'user_id' => $userId,
+            'user_oid' => $user->_id,
+            'full_name' => $user->full_name ?? $user->short_username,
+            'title' => $post->content,
+        ]);
     }
 }

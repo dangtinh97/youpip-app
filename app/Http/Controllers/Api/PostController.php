@@ -126,4 +126,13 @@ class PostController extends Controller
 
         return response()->json($delete->toArray());
     }
+
+    public function show(string $id)
+    {
+        if (!StrHelper::isObjectId($id)) {
+            return response()->json((new ResponseError(EStatusApi::FAIL->value))->toArray());
+        }
+
+
+    }
 }

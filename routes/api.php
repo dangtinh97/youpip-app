@@ -43,6 +43,7 @@ Route::controller(PostController::class)
         Route::post('/','create');
         Route::post("/{id}/reaction",'reaction');
         Route::delete("/{id}",'delete');
+        Route::delete("/{id}",'show');
         Route::post("/{id}/comment",'comment');
         Route::get("/{id}/comment",'listComment');
     });

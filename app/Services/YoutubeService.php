@@ -158,9 +158,9 @@ class YoutubeService
             $timeExpire = (int)$matches[1];
 
             $output = [
-                'mime_type' => $last->mimeType,
-                'url' => $last->url,
-                'quality' => $last->quality
+                'mime_type' => "",
+                'url' => $url,
+                'quality' => ""
             ];
 
             $this->viewRepository->findAndModify([

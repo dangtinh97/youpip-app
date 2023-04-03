@@ -185,7 +185,7 @@ class ChatService
                 'time' => $time ?? '',
                 'message' => $message,
                 'user_id' => $fromUserId ?? 0,
-                'full_name' => $user['full_name'] ?? $user['short_username']
+                'full_name' => $user['full_name'] ?? ($user['short_username'] ?? '')
             ];
         });
 

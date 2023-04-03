@@ -68,6 +68,7 @@ class YoutubeService
             }
             $output[] = [
                 'video_oid' => (new ObjectId())->__toString(),
+                'last_oid' => (new ObjectId())->__toString(),
                 'video_id' => $videoId,
                 'thumbnail' => (string)Arr::get($videoRender, 'thumbnail.thumbnails.0.url'),
                 'title' => (string)Arr::get($videoRender, 'title.runs.0.text'),

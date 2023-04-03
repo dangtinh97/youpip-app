@@ -208,9 +208,9 @@ class YoutubeService
      */
     private function crawlFromWebOther($videoId): ?string
     {
-        try{
-            $url ="https://truyenaudio247.com/GetlinkYoutube";
-            $data = Http::post($url,[
+        try {
+            $url = "https://truyenaudio247.com/GetlinkYoutube";
+            $data = Http::post($url, [
                 'TuKhoa' => "https://www.youtube.com/watch?v={$videoId}"
             ])->body();
 
@@ -219,12 +219,12 @@ class YoutubeService
 
             /** @var \simple_html_dom\simple_html_dom_node $first */
             $first = $dom->find('a[class="btn btn-outline-danger btn-sm"]')[0];
-            return (string)str_replace("&amp;","&",$first->attr['href']);
-        }catch (\Exception $exception){
+            $url = (string)str_replace("&amp;", "&", $first->attr['href']);
+
+            return substr($url, 0, strpos($url, "&title"));
+        } catch (\Exception $exception) {
             return null;
         }
-
-
     }
 
     /**

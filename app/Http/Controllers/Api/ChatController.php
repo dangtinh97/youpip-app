@@ -59,7 +59,7 @@ class ChatController extends Controller
     public function message(string $id, Request $request): JsonResponse
     {
         $lastOid = (string)$request->get('last_oid');
-        if (StrHelper::isObjectId($lastOid)) {
+        if (!StrHelper::isObjectId($lastOid)) {
             $lastOid = null;
         }
         $message = $this->chatService->message($id, $lastOid);

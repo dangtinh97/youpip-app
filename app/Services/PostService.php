@@ -110,7 +110,7 @@ class PostService
 
             return [
                 'user_id' => $post->user_id,
-                'full_name' => Arr::get($userName, '0.full_name', '0.short_username'),
+                'full_name' => Arr::get($userName, '0.full_name', Arr::get($userName, '0.short_username', 'Người dùng')),
                 'image' => $image,
                 'content' => $post->content,
                 'post_oid' => $post->_id,

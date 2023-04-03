@@ -28,9 +28,7 @@ class RoomRepository extends BaseRepository
                 '$in' => [$userId]
             ]
         ];
-        $match['join'] = [
-            '$exists' => true
-        ];
+
         if ($lastOid) {
             $match['_id'] = [
                 '$lt' => new ObjectId($lastOid)

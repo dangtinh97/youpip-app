@@ -138,9 +138,7 @@ class YoutubeService
         $output = [];
         try {
             $downloadOptions = $youtube->getDownloadLinks($url);
-            $infos = (array)$downloadOptions->getInfo();
-            $thumbs = Arr::get($infos,"\x00*\x00videoDetails.thumbnail.thumbnails" ,[]);
-            /** @var array $combine */
+            dd($downloadOptions);
             if (!$combine = $downloadOptions->getCombinedFormats()) {
                 throw new \Exception("Not find getCombinedFormats link");
             }
@@ -154,7 +152,7 @@ class YoutubeService
 
             $output = [
                 'mime_type' => $last->mimeType,
-                'url' => base64_encode($last->url),
+                'url' => $last->url,
                 'quality' => $last->quality
             ];
 
@@ -175,9 +173,6 @@ class YoutubeService
                     'time_expire' => new UTCDateTime($timeExpire * 1000)
                 ])
             ];
-//            if(count($thumbs)>0){
-//                $update['thumbnail'] = Arr::last($thumbs)['url'];
-//            }
 
             $this->videoRepository->update([
                 'video_id' => $videoId,

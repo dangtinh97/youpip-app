@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helper\StrHelper;
 use App\Http\Controllers\Controller;
 use App\Services\YoutubeService;
 use Illuminate\Http\JsonResponse;
@@ -20,7 +21,14 @@ class YoutubeController extends Controller
      */
     public function videoNew(Request $request): JsonResponse
     {
-        $result = $this->youtubeService->listVideo("");
+        $lastOid = $request->get('last_oid','');
+        $lastOid = StrHelper::isObjectId($lastOid) ? $lastOid : null;
+        if ($request->get('type') === "recently_view") {
+            $result = $this->youtubeService->recentlyView($lastOid);
+        } else {
+            $result = $this->youtubeService->listVideo("");
+        }
+
 
         return response()->json($result->toArray());
     }

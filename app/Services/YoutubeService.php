@@ -13,6 +13,7 @@ use App\Repositories\ViewRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use YouTube\Exception\YouTubeException;
 use YouTube\YouTubeDownloader;
@@ -66,6 +67,7 @@ class YoutubeService
                 continue;
             }
             $output[] = [
+                'video_oid' => (new ObjectId())->__toString(),
                 'video_id' => $videoId,
                 'thumbnail' => (string)Arr::get($videoRender, 'thumbnail.thumbnails.0.url'),
                 'title' => (string)Arr::get($videoRender, 'title.runs.0.text'),
@@ -83,6 +85,39 @@ class YoutubeService
         return new ResponseSuccess([
             'list' => $output,
             'token' => $token
+        ]);
+    }
+
+    /**
+     * @param string|null $lastOid
+     *
+     * @return \App\Http\Response\ApiResponse
+     */
+    public function recentlyView(?string $lastOid): ApiResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        $views = $this->viewRepository->recentlyView($user->id, $lastOid);
+        $maps = $views->map(function ($item) {
+            /** @var \App\Models\View $item */
+
+            $videoRender = $item->getAttribute('video') ?? [];
+
+            return [
+                'video_oid' => (string)Arr::get($videoRender, '_id'),
+                'video_id' => (string)Arr::get($videoRender, 'video_id'),
+                'thumbnail' => (string)Arr::get($videoRender, 'thumbnail'),
+                'title' => (string)Arr::get($videoRender, 'title'),
+                'time_text' => (string)Arr::get($videoRender, 'time_text'),
+                'view_count_text' => (string)Arr::get($videoRender, 'view_count_text'),
+                'chanel_name' => (string)Arr::get($videoRender, 'chanel_name'),
+                'chanel_url' => (string)Arr::get($videoRender, 'chanel_url'),
+                'published_time' => (string)Arr::get($videoRender, 'published_time')
+            ];
+        });
+
+        return new ResponseSuccess([
+            'list' => $maps->toArray()
         ]);
     }
 

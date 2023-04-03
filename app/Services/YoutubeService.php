@@ -104,6 +104,7 @@ class YoutubeService
             $videoRender = $item->getAttribute('video') ?? [];
 
             return [
+                'last_oid'=> $item->_id,
                 'video_oid' => (string)Arr::get($videoRender, '_id'),
                 'video_id' => (string)Arr::get($videoRender, 'video_id'),
                 'thumbnail' => (string)Arr::get($videoRender, 'thumbnail'),
@@ -335,7 +336,6 @@ class YoutubeService
                     continue;
                 }
                 $thumbnails = Arr::get($videoRender, 'thumbnail.thumbnails');
-
                 $output[] = [
                     'video_id' => $videoId,
                     'thumbnail' => (string)(Arr::last($thumbnails)['url'] ?? ''),
@@ -348,8 +348,6 @@ class YoutubeService
                     'published_time' => $publishTime
                 ];
             }
-
-//            $this->loadMore($body,$tokenContinue);
 
             if(!$output){
                 return new ResponseError();

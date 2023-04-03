@@ -227,7 +227,8 @@ class ChatService
         }
 
         return new ResponseSuccess([
-            'room_oid' => $room->_id
+            'room_oid' => $room->_id,
+            'full_name' => $userFind->full_name ?? $userFind->short_username,
         ]);
     }
 

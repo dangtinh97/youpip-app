@@ -8,6 +8,7 @@ use App\Http\Response\ApiResponse;
 use App\Http\Response\ResponseError;
 use App\Http\Response\ResponseSuccess;
 use App\Models\Room;
+use App\Models\User;
 use App\Repositories\ConfigRepository;
 use App\Repositories\LogRepository;
 use App\Repositories\MessageRepository;
@@ -281,5 +282,28 @@ class ChatService
         ]);
 
         return $user->_id;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return \App\Http\Response\ApiResponse
+     */
+    public function searchUser(string $value):ApiResponse
+    {
+        /** @var \App\Models\User|null $user */
+        $user = $this->userRepository->first([
+            'short_username' => $value
+        ]);
+
+        if(!$user instanceof User){
+            return new ResponseError();
+        }
+
+        return new ResponseSuccess([
+            'user_oid' => $user->_id,
+            'user_id'  =>$user->id,
+            'full_name' => $user->full_name ?? $user->short_username
+        ]);
     }
 }

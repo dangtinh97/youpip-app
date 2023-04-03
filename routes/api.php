@@ -62,6 +62,8 @@ Route::controller(ChatController::class)
         Route::get('/','listChat');
         Route::get("/chat-gpt",'chatGpt');
         Route::get('/join-room','joinRoom');
+        Route::get('/search-user','searchUser');
         Route::get('/{id}','message');
         Route::post('/{id}','sendMessage');
+
     });

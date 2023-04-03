@@ -79,4 +79,17 @@ class ChatController extends Controller
 
         return response()->json($send->toArray());
     }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function searchUser(Request $request): JsonResponse
+    {
+        $shortUserName = $request->get('username');
+        $search = $this->chatService->searchUser($shortUserName);
+
+        return response()->json($search->toArray());
+    }
 }

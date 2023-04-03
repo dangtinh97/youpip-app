@@ -39,6 +39,7 @@ Route::controller(PostController::class)
     ->middleware('auth')
     ->group(function (){
         Route::get('/','index');
+        Route::get('/feed','postMe');
         Route::post('/','create');
         Route::post("/{id}/reaction",'reaction');
         Route::post("/{id}/comment",'comment');

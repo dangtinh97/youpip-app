@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Services\PostService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
@@ -27,6 +28,25 @@ class PostController extends Controller
             $lastPostOid = null;
         }
         $data = $this->postService->index($lastPostOid,null);
+
+        return response()->json($data->toArray());
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function postMe(Request $request): JsonResponse
+    {
+        $lastPostOid = (string)$request->get('post_last_oid');
+        if (!StrHelper::isObjectId($lastPostOid)) {
+            $lastPostOid = null;
+        }
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        $data = $this->postService->index($lastPostOid,$user->id);
 
         return response()->json($data->toArray());
     }

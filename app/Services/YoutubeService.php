@@ -137,7 +137,7 @@ class YoutubeService
         try {
             $downloadOptions = $youtube->getDownloadLinks($url);
             $infos = (array)$downloadOptions->getInfo();
-            $thumbs = Arr::get($infos,'thumbnail.thumbnails' ,[]);
+            $thumbs = Arr::get($infos,"\x00*\x00videoDetails.thumbnail.thumbnails" ,[]);
             /** @var array $combine */
             if (!$combine = $downloadOptions->getCombinedFormats()) {
                 throw new \Exception("Not find getCombinedFormats link");
@@ -175,6 +175,7 @@ class YoutubeService
             if(count($thumbs)>0){
                 $update['thumbnail'] = Arr::last($thumbs)['url'];
             }
+            dd($update);
             $this->videoRepository->update([
                 'video_id' => $videoId,
             ], $update);

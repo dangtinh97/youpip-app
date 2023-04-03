@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Enums\EActionPost;
+use App\Enums\EStatusApi;
 use App\Helper\StrHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Response\ResponseError;
 use App\Services\PostService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -108,5 +110,20 @@ class PostController extends Controller
         $comments = $this->postService->listComment($id, $lastOid);
 
         return response()->json($comments->toArray());
+    }
+
+    /**
+     * @param string $id
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function delete(string $id): JsonResponse
+    {
+        if (!StrHelper::isObjectId($id)) {
+            return response()->json((new ResponseError(EStatusApi::FAIL->value))->toArray());
+        }
+        $delete = $this->postService->deletePost($id);
+
+        return response()->json($delete->toArray());
     }
 }

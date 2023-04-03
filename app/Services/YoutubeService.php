@@ -327,9 +327,11 @@ class YoutubeService
                 if (!$publishTime || !$timeText) {
                     continue;
                 }
+                $thumbnails = Arr::last($videoRender, 'thumbnail.thumbnails');
+
                 $output[] = [
                     'video_id' => $videoId,
-                    'thumbnail' => (string)Arr::get($videoRender, 'thumbnail.thumbnails.0.url'),
+                    'thumbnail' => (string)Arr::last($thumbnails)['url'] ?? '',
                     'title' => (string)Arr::get($videoRender, 'title.simpleText'),
                     'time_text' => $timeText,
                     'view_count_text' => (string)Arr::get($videoRender, 'shortViewCountText.simpleText'),

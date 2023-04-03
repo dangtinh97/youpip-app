@@ -110,7 +110,7 @@ class PostService
 
             return [
                 'user_id' => $post->user_id,
-                'full_name' => Arr::get($userName, '0.full_name', 'Người dùng'),
+                'full_name' => Arr::get($userName, '0.full_name', '0.short_username'),
                 'image' => $image,
                 'content' => $post->content,
                 'post_oid' => $post->_id,
@@ -363,7 +363,7 @@ class PostService
             return [
                 "content" => $comment->content ?? '',
                 "user_id" => $comment->user_id,
-                "full_name" => $comment->getAttribute('full_name') ?? 'Người dùng',
+                "full_name" => $comment->getAttribute('full_name') ?? $comment->getAttribute('short_username'),
                 "action_oid" => $comment->_id,
             ];
         });

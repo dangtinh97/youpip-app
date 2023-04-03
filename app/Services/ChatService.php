@@ -178,12 +178,14 @@ class ChatService
                 $time = date('H:i:s',$time->toDateTime()->getTimestamp());
             }
 
+            $user = $users->where('id','!=',$userId)->first();
+
             return [
                 'room_oid' => $item->_id,
                 'time' => $time ?? '',
                 'message' => $message,
                 'user_id' => $fromUserId ?? 0,
-                'full_name' => $users->where('id','!=',$userId)->first()['full_name'] ?? 'Người dùng'
+                'full_name' => $user['full_name'] ?? $user['short_username']
             ];
         });
 

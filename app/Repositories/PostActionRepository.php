@@ -54,7 +54,10 @@ class PostActionRepository extends BaseRepository
                     ],
                     'action_oid' => [
                         '$toString' => '$_id'
-                    ]
+                    ],
+                    'short_username' => [
+                        '$arrayElemAt'=> ['$users.short_username', 0]
+                    ],
                 ]
             ]
         ];

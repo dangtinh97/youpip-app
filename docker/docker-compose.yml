@@ -7,6 +7,8 @@ services:
     volumes:
       - ../:/var/www/html
       - ./nginx/conf.d/default.conf:/etc/nginx/nginx.conf
+      - ./nginx/server.crt:/etc/nginx/server.crt
+      - ./nginx/server.key:/etc/nginx/server.key
     ports:
       - '80:80'
     networks:

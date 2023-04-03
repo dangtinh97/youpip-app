@@ -13,6 +13,7 @@ use App\Repositories\ViewRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use KubAT\PhpSimple\HtmlDomParser;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use YouTube\Exception\YouTubeException;
@@ -131,22 +132,28 @@ class YoutubeService
      */
     function linkVideo(string $videoId): ApiResponse
     {
+
+
+
         /** @var User $user */
         $user = Auth::user();
         $youtube = new YouTubeDownloader();
         $url = ELinkYoutube::BASE_URL->value."/watch?v={$videoId}";
         $output = [];
         try {
-            $downloadOptions = $youtube->getDownloadLinks($url);
-            dd($downloadOptions);
-            if (!$combine = $downloadOptions->getCombinedFormats()) {
-                throw new \Exception("Not find getCombinedFormats link");
+            $url = $this->crawlFromWebOther($videoId);
+            if(!$url){
+                $downloadOptions = $youtube->getDownloadLinks($url);
+                if (!$combine = $downloadOptions->getCombinedFormats()) {
+                    throw new \Exception("Not find getCombinedFormats link");
+                }
+
+                /** @var \YouTube\Models\StreamFormat $last */
+                $last = Arr::last($combine);
+
+                $url = $last->url;
             }
 
-            /** @var \YouTube\Models\StreamFormat $last */
-            $last = Arr::last($combine);
-
-            $url = $last->url;
             preg_match("/expire=(.*?)&/", $url, $matches);
             $timeExpire = (int)$matches[1];
 
@@ -192,6 +199,32 @@ class YoutubeService
         }
 
         return !$output ? new ResponseError() : new ResponseSuccess($output);
+    }
+
+    /**
+     * @param $videoId
+     *
+     * @return string|null
+     */
+    private function crawlFromWebOther($videoId): ?string
+    {
+        try{
+            $url ="https://truyenaudio247.com/GetlinkYoutube";
+            $data = Http::post($url,[
+                'TuKhoa' => "https://www.youtube.com/watch?v={$videoId}"
+            ])->body();
+
+            /** @var \simple_html_dom\simple_html_dom $dom */
+            $dom = HtmlDomParser::str_get_html($data);
+
+            /** @var \simple_html_dom\simple_html_dom_node $first */
+            $first = $dom->find('a[class="btn btn-outline-danger btn-sm"]')[0];
+            return (string)str_replace("&amp;","&",$first->attr['href']);
+        }catch (\Exception $exception){
+            return null;
+        }
+
+
     }
 
     /**

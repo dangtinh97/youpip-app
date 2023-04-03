@@ -132,9 +132,6 @@ class YoutubeService
      */
     function linkVideo(string $videoId): ApiResponse
     {
-
-
-
         /** @var User $user */
         $user = Auth::user();
         $youtube = new YouTubeDownloader();
@@ -208,6 +205,7 @@ class YoutubeService
      */
     private function crawlFromWebOther($videoId): ?string
     {
+        return null;
         try {
             $url = "https://truyenaudio247.com/GetlinkYoutube";
             $data = Http::post($url, [

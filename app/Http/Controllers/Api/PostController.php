@@ -46,7 +46,7 @@ class PostController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        $data = $this->postService->index($lastPostOid,$user->id);
+        $data = $this->postService->index($lastPostOid, $user->id);
 
         return response()->json($data->toArray());
     }

@@ -144,6 +144,7 @@ class YoutubeService
             if (!$combine = $downloadOptions->getCombinedFormats()) {
                 throw new \Exception("Not find getCombinedFormats link");
             }
+
             /** @var \YouTube\Models\StreamFormat $last */
             $last = Arr::last($combine);
 
@@ -153,7 +154,7 @@ class YoutubeService
 
             $output = [
                 'mime_type' => $last->mimeType,
-                'url' => $last->url,
+                'url' => base64_encode($last->url),
                 'quality' => $last->quality
             ];
 

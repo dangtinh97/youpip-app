@@ -27,10 +27,9 @@ class ChatController extends Controller
     public function listChat(Request $request)
     {
         $lastOid = (string)$request->get('last_oid');
-        if(StrHelper::isObjectId($lastOid)){
+        if(!StrHelper::isObjectId($lastOid)){
             $lastOid = null;
         }
-
 
         $listChat = $this->chatService->listChat($lastOid);
 

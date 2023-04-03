@@ -293,7 +293,7 @@ class ChatService
     {
         /** @var \App\Models\User|null $user */
         $user = $this->userRepository->first([
-            'short_username' => $value
+            'short_username' => strtoupper($value)
         ]);
 
         if(!$user instanceof User){

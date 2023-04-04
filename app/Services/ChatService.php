@@ -129,10 +129,23 @@ class ChatService
             $keys = explode(",",Arr::get($data,'api_key',$key));
             shuffle($keys);
             $client = OpenAI::client($key = $keys[0] ?? $key);
-            $response = $client->chat()->create([
-                'model' => 'gpt-3.5-turbo',
-                'messages' => $messages
-            ])->toArray();
+
+
+//            $response = $client->chat()->create([
+//                'model' => 'gpt-3.5-turbo',
+//                'messages' => $messages
+//            ])->toArray();
+
+            $response = [
+                'choices' => [
+                    [
+                        'message' => [
+                            'content' => "Bây giờ là: ".date('H:i:s')
+                        ]
+                    ]
+                ]
+            ];
+
 
             $this->logRepository->create([
                 'type' => 'OPEN_AI',

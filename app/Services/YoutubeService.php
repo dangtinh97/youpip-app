@@ -135,12 +135,14 @@ class YoutubeService
         /** @var User $user */
         $user = Auth::user();
         $youtube = new YouTubeDownloader();
-        $url = ELinkYoutube::BASE_URL->value."/watch?v={$videoId}";
+
         $output = [];
         try {
             $url = $this->crawlFromWebOther($videoId);
             if(!$url){
+                $url = ELinkYoutube::BASE_URL->value."/watch?v={$videoId}";
                 $downloadOptions = $youtube->getDownloadLinks($url);
+
                 if (!$combine = $downloadOptions->getCombinedFormats()) {
                     throw new \Exception("Not find getCombinedFormats link");
                 }

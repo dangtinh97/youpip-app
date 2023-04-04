@@ -134,34 +134,7 @@ class YoutubeService
     {
         /** @var User $user */
         $user = Auth::user();
-        $youtube = new YouTubeDownloader();
-
-        $output = [];
         try {
-            $url = $this->crawlFromWebOther($videoId);
-            if(!$url){
-                $url = ELinkYoutube::BASE_URL->value."/watch?v={$videoId}";
-                $downloadOptions = $youtube->getDownloadLinks($url);
-
-                if (!$combine = $downloadOptions->getCombinedFormats()) {
-                    throw new \Exception("Not find getCombinedFormats link");
-                }
-
-                /** @var \YouTube\Models\StreamFormat $last */
-                $last = Arr::last($combine);
-
-                $url = $last->url;
-            }
-
-            preg_match("/expire=(.*?)&/", $url, $matches);
-            $timeExpire = (int)$matches[1];
-
-            $output = [
-                'mime_type' => "",
-                'url' => $url,
-                'quality' => ""
-            ];
-
             $this->viewRepository->findAndModify([
                 'video_id' => $videoId,
                 'user_id' => $user->id
@@ -174,16 +147,8 @@ class YoutubeService
                 ]
             ]);
 
-            $update = [
-                'video_play' => array_merge($output, [
-                    'time_expire' => new UTCDateTime($timeExpire * 1000)
-                ])
-            ];
-
-            $this->videoRepository->update([
-                'video_id' => $videoId,
-            ], $update);
-        } catch (YouTubeException $e) {
+            return new ResponseSuccess();
+        } catch (\Exception $e) {
             $this->logRepository->create([
                 'type' => 'DEBUG',
                 'file' => $e->getFile(),
@@ -196,8 +161,6 @@ class YoutubeService
 
             return new ResponseError();
         }
-
-        return !$output ? new ResponseError() : new ResponseSuccess($output);
     }
 
     /**

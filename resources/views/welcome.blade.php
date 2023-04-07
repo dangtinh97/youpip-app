@@ -58,7 +58,7 @@
         console.log("YouPiP")
         setTimeout(function () {
             console.log("YouPiP redirect")
-            // window.location.href = 'https://play.google.com/store/apps/details?id=org.youpip.app&hl=vi&gl=US'
+            window.location.href = 'https://play.google.com/store/apps/details?id=org.youpip.app&hl=vi&gl=US'
         }, 2000)
     })
 </script>

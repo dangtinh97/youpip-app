@@ -11,7 +11,6 @@ services:
       - ./nginx/server.key:/etc/nginx/server.key
     ports:
       - '8000:80'
-      - '443:443'
     networks:
       - backend
   php_pip:

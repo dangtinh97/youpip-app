@@ -1,19 +1,19 @@
 version: '3'
 services:
-#  nginx_pip:
-#    container_name: 'nginx_pip'
-#    image: 'nginx:latest'
-#    working_dir: /var/www/html
-#    volumes:
-#      - ../:/var/www/html
-#      - ./nginx/conf.d/default.conf:/etc/nginx/nginx.conf
-#      - ./nginx/server.crt:/etc/nginx/server.crt
-#      - ./nginx/server.key:/etc/nginx/server.key
-#    ports:
-#      - '8000:80'
-#      - '443:443'
-#    networks:
-#      - backend
+  nginx_pip:
+    container_name: 'nginx_pip'
+    image: 'nginx:latest'
+    working_dir: /var/www/html
+    volumes:
+      - ../:/var/www/html
+      - ./nginx/conf.d/default.conf:/etc/nginx/nginx.conf
+      - ./nginx/server.crt:/etc/nginx/server.crt
+      - ./nginx/server.key:/etc/nginx/server.key
+    ports:
+      - '8000:80'
+      - '443:443'
+    networks:
+      - backend
   php_pip:
     container_name: 'php_pip'
     build:

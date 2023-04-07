@@ -18,3 +18,4 @@
 ### certbot
 - use reverse proxy
 https://www.inmotionhosting.com/support/website/ssl/lets-encrypt-ssl-ubuntu-with-certbot/
+fix nginx: https://stackoverflow.com/questions/35868976/nginx-service-failed-because-the-control-process-exited

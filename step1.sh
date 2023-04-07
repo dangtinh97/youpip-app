@@ -1,1 +1,1 @@
-cp ./docker/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
+cp ./docker/nginx/conf.d/default-2.conf /etc/nginx/nginx.conf

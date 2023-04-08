@@ -7,6 +7,7 @@ use App\Http\Response\ApiResponse;
 use App\Http\Response\ResponseError;
 use App\Http\Response\ResponseSuccess;
 use App\Models\User;
+use App\Models\Video;
 use App\Repositories\LogRepository;
 use App\Repositories\VideoRepository;
 use App\Repositories\ViewRepository;
@@ -208,7 +209,8 @@ class YoutubeService
                     'view_count_text' => $video['view_count_text'] ?? '',
                     'chanel_name' => $video['chanel_name'] ?? '',
                     'chanel_url' => $video['chanel_url'] ?? '',
-                    'published_time' => $video['published_time'] ?? ''
+                    'published_time' => $video['published_time'] ?? '',
+                    'updated_at' => new UTCDateTime()
                 ]
             ]);
         }
@@ -282,7 +284,9 @@ class YoutubeService
                 'chanel_name' => (string)Arr::get($videoRender, 'longBylineText.runs.0.text'),
                 'chanel_url' => (string)Arr::get($videoRender,
                     'longBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl'),
-                'published_time' => $publishTime
+                'published_time' => $publishTime,
+                'created_at' => new UTCDateTime(),
+                'updated_at' => new UTCDateTime()
             ];
         }
         $this->saveVideo($output);
@@ -387,5 +391,75 @@ class YoutubeService
         }
         return [];
 
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return \App\Http\Response\ApiResponse
+     */
+    public function detailVideo(string $url): ApiResponse
+    {
+        $id = str_replace("https://youtu.be/", "", $url);
+        $url = "https://www.youtube.com/watch?v={$id}";
+        $body = Http::withHeaders($this->headerCountryCode())->get($url)->body();
+        $json = preg_match('/>var ytInitialPlayerResponse = (.*?);var meta/', $body, $matches);
+
+        if (count($matches) != 2) {
+            return new ResponseError();
+        }
+
+        $data = json_decode($matches[1], true);
+
+        $detail = Arr::get($data, 'videoDetails', []);
+
+        $title = Arr::get($detail, 'title', '');
+
+        $thumbnails = Arr::get($detail, 'thumbnail.thumbnails', []);
+
+        $time = (int)Arr::get($detail, "lengthSeconds", '');
+
+        $save = [
+            'video_id' => Arr::get($detail, 'videoId', ''),
+            'thumbnail' => (string)(Arr::last($thumbnails)['url'] ?? ''),
+            'title' => $title,
+            'time_text' => $this->convertTime($time),
+            'view_count_text' => Arr::get($detail, 'viewCount'),
+            'chanel_name' => Arr::get($detail, 'author', ''),
+            'chanel_url' => (string)Arr::get($detail,
+                'channelId'),
+            'published_time' => Arr::get($data, 'microformat.playerMicroformatRenderer.publishDate')
+        ];
+
+        /** @var Video|null $video */
+        $video = $this->videoRepository->first([
+            'video_id' => $save['video_id']
+        ]);
+        if ($video instanceof Video) {
+            $video->update($save);
+        }else{
+            /** @var Video $video */
+
+            $video = $this->videoRepository->create($save);
+
+        }
+
+        $save = array_merge($save,[
+            'video_oid' => $video->_id,
+            'last_oid' => (new ObjectId())->__toString(),
+        ]);
+
+        return new ResponseSuccess($save);
+    }
+
+    private function convertTime(int $time):string{
+        $hours = floor($time / 3600);
+        $minutes = floor(($time / 60) % 60);
+        $seconds = $time % 60;
+        if($hours<1){
+            return "$minutes:$seconds";
+        }
+
+        return "$hours:$minutes:$seconds";
     }
 }

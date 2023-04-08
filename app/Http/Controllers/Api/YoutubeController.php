@@ -28,8 +28,6 @@ class YoutubeController extends Controller
         } else {
             $result = $this->youtubeService->listVideo("");
         }
-
-
         return response()->json($result->toArray());
     }
 
@@ -83,5 +81,18 @@ class YoutubeController extends Controller
         $find = $this->youtubeService->videoSuggestById($videoId);
 
         return response()->json($find->toArray());
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function detailVideo(Request $request): JsonResponse
+    {
+        $url = $request->get('url');
+        $detail = $this->youtubeService->detailVideo($url);
+
+        return response()->json($detail->toArray());
     }
 }

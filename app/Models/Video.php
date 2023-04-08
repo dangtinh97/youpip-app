@@ -6,6 +6,9 @@ namespace App\Models;
 
 use Jenssegers\Mongodb\Eloquent\Model;
 
+/**
+ * @property string $_id
+ */
 class Video extends Model
 {
     /**
@@ -16,7 +19,7 @@ class Video extends Model
     /**
      * @var string[]
      */
-    protected $table = [
+    protected $fillable = [
         'video_id',
         'title',
         'thumbnail',

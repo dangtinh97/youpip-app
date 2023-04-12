@@ -44,7 +44,7 @@ class VtvGoService
             $output[] = [
                 'video_oid' => (new ObjectId())->__toString(),
                 'last_oid' => (new ObjectId())->__toString(),
-                'video_id' => Arr::get($channel, 'chanel_name'),
+                'video_id' => Arr::get($channel, 'path'),
                 'thumbnail' => (string)Arr::get($channel, 'thumbnail'),
                 'title' => 'Xem truyền hình trực tuyến '.(string)Arr::get($channel, 'title'),
                 'time_text' => '--:--',

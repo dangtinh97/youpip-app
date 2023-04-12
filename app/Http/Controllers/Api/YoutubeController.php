@@ -4,13 +4,17 @@ namespace App\Http\Controllers\Api;
 
 use App\Helper\StrHelper;
 use App\Http\Controllers\Controller;
+use App\Services\VtvGoService;
 use App\Services\YoutubeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class YoutubeController extends Controller
 {
-    public function __construct(protected YoutubeService $youtubeService)
+    public function __construct(
+        protected YoutubeService $youtubeService,
+        protected readonly VtvGoService $vtvGoService
+    )
     {
     }
 
@@ -23,11 +27,14 @@ class YoutubeController extends Controller
     {
         $lastOid = $request->get('last_oid','');
         $lastOid = StrHelper::isObjectId($lastOid) ? $lastOid : null;
-        if ($request->get('type') === "recently_view") {
-            $result = $this->youtubeService->recentlyView($lastOid);
-        } else {
-            $result = $this->youtubeService->listVideo("");
-        }
+
+
+        $result = match ($request->get('type')){
+            "recently_view" => $this->youtubeService->recentlyView($lastOid),
+            "vtv_go" => $this->vtvGoService->listChannel(),
+            default => $this->youtubeService->listVideo("")
+        };
+
         return response()->json($result->toArray());
     }
 

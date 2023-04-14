@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Http\Response\ApiResponse;
+use App\Http\Response\ResponseError;
 use App\Http\Response\ResponseSuccess;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Http;
 use MongoDB\BSON\ObjectId;
 
 class VtvGoService
@@ -58,5 +60,41 @@ class VtvGoService
         return new ResponseSuccess([
             'list' => $output
         ]);
+    }
+
+    public function linkPlay(string $url)
+    {
+        $userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36';
+        $end = Arr::last(explode('-',$url));
+        $body = Http::withHeaders([
+            'user-agent' => $userAgent
+        ])->get($url);
+        $headers = $body->headers();
+
+
+        preg_match('/var token = \'(.*?)\';/',$body->body(),$m);
+        if(count($m)!==2){
+            return new ResponseError();
+        }
+        $token = $m[1];
+        $id =  (int)$end;
+        $time = explode('.',$token)[0];
+        /**
+        type_id: 1
+        id: 2
+        time: 1681275630
+        token: 1681275630.7571afc4bd6e72a1fabc6f115233570a
+         */
+
+        $json = Http::withHeaders([
+            'user-agent' => $userAgent,
+            'Cookie' => implode("; ",Arr::get($headers,'Set-Cookie'))
+        ])->post('https://vtvgo.vn/ajax-get-stream',[
+           'type_id' => 1,
+           'id' => $id,
+           'time' => $time,
+           'token' => $token
+        ])->json();
+        dd($json);
     }
 }

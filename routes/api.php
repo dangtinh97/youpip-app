@@ -55,6 +55,8 @@ Route::controller(AuthController::class)
     });
 
 Route::post('/attachment',[\App\Http\Controllers\Api\AttachmentController::class,'create'])->middleware('auth');
+Route::get('/vtv-go/link-play',[\App\Http\Controllers\Api\VtvGoController::class,'linkPlay']);
+//    ->middleware('auth');
 
 Route::controller(ChatController::class)
     ->prefix('/chats')
@@ -68,3 +70,4 @@ Route::controller(ChatController::class)
         Route::post('/{id}','sendMessage');
 
     });
+

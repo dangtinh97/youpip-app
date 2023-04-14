@@ -11,4 +11,10 @@ class VtvGoController extends Controller
     public function __construct(protected readonly VtvGoService $vtvGoService)
     {
     }
+
+    public function linkPlay(Request $request)
+    {
+        $url = "https://vtvgo.vn/".$request->get('path');
+        $this->vtvGoService->linkPlay($url);
+    }
 }

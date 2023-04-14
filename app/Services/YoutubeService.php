@@ -54,11 +54,18 @@ class YoutubeService
         if (!is_array($data)) {
             return new ResponseSuccess();
         }
+
+        $reels = [];
         $output = [];
         $contents = (array)Arr::get($data,
             'contents.twoColumnBrowseResultsRenderer.tabs.0.tabRenderer.content.richGridRenderer.contents', []);
         foreach ($contents as $content) {
             /** @var array $content */
+
+            $short = Arr::get($content, 'richSectionRenderer');
+            if ($short) {
+                $reels[] = $this->formatCodeShort($short);
+            }
             $videoRender = (array)Arr::get($content, 'richItemRenderer.content.videoRenderer');
             if (!$videoId = Arr::get($videoRender, 'videoId')) {
                 continue;
@@ -86,9 +93,41 @@ class YoutubeService
         $this->saveVideo($output);
 
         return new ResponseSuccess([
+            'reels' => Arr::collapse($reels),
             'list' => $output,
             'token' => $token
         ]);
+    }
+
+    private function formatCodeShort(array $data): array
+    {
+        $output = [];
+        $reels = Arr::get($data,'content.richShelfRenderer.contents');
+        foreach ($reels as $reel){
+            /** @var array $reel */
+            $videoRender = (array)Arr::get($reel, 'richItemRenderer.content.reelItemRenderer');
+//            dd($videoRender);
+            if (!$videoId = Arr::get($videoRender, 'videoId')) {
+                continue;
+            }
+            $publishTime = (string)Arr::get($videoRender, 'publishedTimeText.simpleText');
+            $timeText = (string)Arr::get($videoRender, 'lengthText.simpleText');
+
+            $output[] = [
+                'video_oid' => (new ObjectId())->__toString(),
+                'last_oid' => (new ObjectId())->__toString(),
+                'video_id' => $videoId,
+                'thumbnail' => (string)Arr::get($videoRender, 'thumbnail.thumbnails.0.url'),
+                'title' => (string)Arr::get($videoRender, 'headline.simpleText'),
+                'time_text' => $timeText,
+                'view_count_text' => (string)Arr::get($videoRender, 'viewCountText.simpleText'),
+                'chanel_name' => (string)Arr::get($videoRender, 'longBylineText.runs.0.text'),
+                'chanel_url' => (string)Arr::get($videoRender,
+                    'longBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl'),
+                'published_time' => $publishTime
+            ];
+        }
+        return $output;
     }
 
     /**

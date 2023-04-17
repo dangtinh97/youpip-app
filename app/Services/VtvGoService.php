@@ -64,6 +64,34 @@ class VtvGoService
 
     public function linkPlay(string $url)
     {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://vieon.vn/truyen-hinh-truc-tuyen/vtv1-hd/',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+
+        preg_match('/<script id="__NEXT_DATA__" type="application\/json">(.*?)<\//',$response,$matches);
+        if(count($matches)!=2){
+            return new ResponseError();
+        }
+        dd($matches[1]);
+        $data = json_decode($matches[1],true);
+        dd($data);
+        dd($matches);
+
+
+
         $userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36';
         $end = Arr::last(explode('-',$url));
         $body = Http::withHeaders([

@@ -25,19 +25,19 @@ class VtvGoService
         $channels = [
             [
                 'path' => 'truyen-hinh-truc-tuyen/vtv1-hd/',
-                'thumbnail' => 'https://liftlearning.com/wp-content/uploads/2020/09/default-image.png',
+                'thumbnail' => 'https://upload.wikimedia.org/wikipedia/commons/f/fc/Logo_VTV1_HD.png',
                 'title' => 'VTV 1',
                 'chanel_name' => 'VTV 1'
             ],
             [
                 'path' => 'truyen-hinh-truc-tuyen/vtv2-hd/',
-                'thumbnail' => 'https://liftlearning.com/wp-content/uploads/2020/09/default-image.png',
+                'thumbnail' => 'https://upload.wikimedia.org/wikipedia/commons/9/91/VTV2%281%29.png',
                 'title' => 'VTV 2',
                 'chanel_name' => 'VTV 2'
             ],
             [
                 'path' => 'truyen-hinh-truc-tuyen/vtv3-hd/',
-                'thumbnail' => 'https://liftlearning.com/wp-content/uploads/2020/09/default-image.png',
+                'thumbnail' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/VTV3_logo_2013_final.svg/320px-VTV3_logo_2013_final.svg.png',
                 'title' => 'VTV 3',
                 'chanel_name' => 'VTV 3'
             ]
@@ -52,7 +52,7 @@ class VtvGoService
                 'thumbnail' => (string)Arr::get($channel, 'thumbnail'),
                 'title' => 'Xem truyền hình trực tuyến '.(string)Arr::get($channel, 'title'),
                 'time_text' => '--:--',
-                'view_count_text' => 0,
+                'view_count_text' => 'ViOn',
                 'chanel_name' => Arr::get($channel, 'chanel_name'),
                 'chanel_url' => '',
                 'published_time' => 'NOW'

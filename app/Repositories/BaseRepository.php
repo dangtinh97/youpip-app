@@ -49,6 +49,17 @@ class BaseRepository
     }
 
     /**
+     * @param array $cond
+     * @param array $column
+     *
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function last(array $cond, array $column = ['*']): ?\Illuminate\Database\Eloquent\Model
+    {
+        return $this->model::query()->where($cond)->select($column)->orderByDesc('_id')->first();
+    }
+
+    /**
      * @param array $data
      *
      * @return \Illuminate\Database\Eloquent\Model

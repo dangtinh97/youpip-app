@@ -5,13 +5,15 @@ namespace App\Services;
 use App\Http\Response\ApiResponse;
 use App\Http\Response\ResponseError;
 use App\Http\Response\ResponseSuccess;
+use App\Models\Log;
+use App\Repositories\LogRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use MongoDB\BSON\ObjectId;
 
 class VtvGoService
 {
-    public function __construct()
+    public function __construct(protected readonly LogRepository $logRepository)
     {
     }
 
@@ -69,16 +71,41 @@ class VtvGoService
      */
     public function linkPlay(string $url): ApiResponse
     {
-        $urlNode = env('URL_NODE', 'http://youpip.net:3003');
-        $response = Http::get("$urlNode/vtv?url=${url}")->json();
-        preg_match('/<script id="__NEXT_DATA__" type="application\/json">(.*?)<\//', $response['data'], $matches);
-        if (count($matches) != 2) {
-            return new ResponseError();
-        }
-        $data = json_decode($matches[1], true);
-
-        return new ResponseSuccess([
-            'url' => Arr::get($data,'props.initialState.LiveTV.detailChannel.linkPlayHls')
+        /** @var \App\Models\Log|null $find */
+        $find = $this->logRepository->last([
+            'type' => 'VTV'.$url,
         ]);
+
+        if($find instanceof Log){
+            $urlPlay = $find->data ?? '';
+            $data = Http::get($urlPlay);
+            if($data->status()==200 && strpos($data->body(),"#EXTM3U")!==false){
+                return new ResponseSuccess([
+                    'url' => $urlPlay
+                ]);
+            }
+            $find = null;
+        }
+
+        if(!$find instanceof Log){
+            $urlNode = env('URL_NODE', 'http://youpip.net:3003');
+            $response = Http::get("$urlNode/vtv?url=${url}")->json();
+            preg_match('/<script id="__NEXT_DATA__" type="application\/json">(.*?)<\//', $response['data'], $matches);
+            if (count($matches) != 2) {
+                return new ResponseError();
+            }
+            $data = json_decode($matches[1], true);
+            $urlPlay = Arr::get($data,'props.initialState.LiveTV.detailChannel.linkPlayHls');
+            $this->logRepository->create([
+                'type' => 'VTV'.$url,
+                'data' => $urlPlay
+            ]);
+            return new ResponseSuccess([
+                'url' => $urlPlay
+            ]);
+        }
+
+        return new ResponseError();
+
     }
 }

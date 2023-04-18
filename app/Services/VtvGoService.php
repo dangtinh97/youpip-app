@@ -22,19 +22,19 @@ class VtvGoService
     {
         $channels = [
             [
-                'path' => 'xem-truc-tuyen-kenh-vtv1-1.html',
+                'path' => 'truyen-hinh-truc-tuyen/vtv1-hd/',
                 'thumbnail' => 'https://liftlearning.com/wp-content/uploads/2020/09/default-image.png',
                 'title' => 'VTV 1',
                 'chanel_name' => 'VTV 1'
             ],
             [
-                'path' => 'xem-truc-tuyen-kenh-vtv2-2.html',
+                'path' => 'truyen-hinh-truc-tuyen/vtv2-hd/',
                 'thumbnail' => 'https://liftlearning.com/wp-content/uploads/2020/09/default-image.png',
                 'title' => 'VTV 2',
                 'chanel_name' => 'VTV 2'
             ],
             [
-                'path' => 'xem-truc-tuyen-kenh-vtv3-3.html',
+                'path' => 'truyen-hinh-truc-tuyen/vtv3-hd/',
                 'thumbnail' => 'https://liftlearning.com/wp-content/uploads/2020/09/default-image.png',
                 'title' => 'VTV 3',
                 'chanel_name' => 'VTV 3'
@@ -62,67 +62,23 @@ class VtvGoService
         ]);
     }
 
-    public function linkPlay(string $url)
+    /**
+     * @param string $url
+     *
+     * @return \App\Http\Response\ResponseError|\App\Http\Response\ResponseSuccess
+     */
+    public function linkPlay(string $url): ApiResponse
     {
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://vieon.vn/truyen-hinh-truc-tuyen/vtv1-hd/',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
-
-        $response = curl_exec($curl);
-
-        curl_close($curl);
-
-        preg_match('/<script id="__NEXT_DATA__" type="application\/json">(.*?)<\//',$response,$matches);
-        if(count($matches)!=2){
+        $urlNode = env('URL_NODE', 'http://youpip.net:3003');
+        $response = Http::get("$urlNode/vtv?url=${url}")->json();
+        preg_match('/<script id="__NEXT_DATA__" type="application\/json">(.*?)<\//', $response['data'], $matches);
+        if (count($matches) != 2) {
             return new ResponseError();
         }
-        dd($matches[1]);
-        $data = json_decode($matches[1],true);
-        dd($data);
-        dd($matches);
+        $data = json_decode($matches[1], true);
 
-
-
-        $userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36';
-        $end = Arr::last(explode('-',$url));
-        $body = Http::withHeaders([
-            'user-agent' => $userAgent
-        ])->get($url);
-        $headers = $body->headers();
-
-
-        preg_match('/var token = \'(.*?)\';/',$body->body(),$m);
-        if(count($m)!==2){
-            return new ResponseError();
-        }
-        $token = $m[1];
-        $id =  (int)$end;
-        $time = explode('.',$token)[0];
-        /**
-        type_id: 1
-        id: 2
-        time: 1681275630
-        token: 1681275630.7571afc4bd6e72a1fabc6f115233570a
-         */
-
-        $json = Http::withHeaders([
-            'user-agent' => $userAgent,
-            'Cookie' => implode("; ",Arr::get($headers,'Set-Cookie'))
-        ])->post('https://vtvgo.vn/ajax-get-stream',[
-           'type_id' => 1,
-           'id' => $id,
-           'time' => $time,
-           'token' => $token
-        ])->json();
-        dd($json);
+        return new ResponseSuccess([
+            'url' => $data
+        ]);
     }
 }

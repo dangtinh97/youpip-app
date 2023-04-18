@@ -84,6 +84,9 @@ class VtvGoService
                     'url' => $urlPlay
                 ]);
             }
+            $this->logRepository->deleteWhere([
+                'type' => 'VTV'.$url,
+            ]);
             $find = null;
         }
 

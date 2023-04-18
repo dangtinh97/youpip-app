@@ -78,7 +78,7 @@ class VtvGoService
         $data = json_decode($matches[1], true);
 
         return new ResponseSuccess([
-            'url' => $data
+            'url' => Arr::get($data,'props.initialState.LiveTV.detailChannel.linkPlayHls')
         ]);
     }
 }

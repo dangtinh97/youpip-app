@@ -93,7 +93,7 @@ class VtvGoService
                 'thumbnail' => (string)Arr::get($channel, 'thumbnail'),
                 'title' => 'Xem truyền hình trực tuyến '.(string)Arr::get($channel, 'title'),
                 'time_text' => '--:--',
-                'view_count_text' => 'VieOn',
+                'view_count_text' => 'youpip.net',
                 'chanel_name' => Arr::get($channel, 'chanel_name'),
                 'chanel_url' => '',
                 'published_time' => 'NOW'

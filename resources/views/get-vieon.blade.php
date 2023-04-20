@@ -63,7 +63,7 @@
         let updateData = (url,json)=>{
             //api.vtv-vieon.update
             $.ajax({
-                url:'{{route('api.vtv-vieon.update')}}',
+                url:'{{route('api.vtv-vieon.update')}}'.replace('http','https'),
                 type:"POST",
                 dataType:"JSON",
                 data:{

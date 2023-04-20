@@ -10,6 +10,7 @@ use App\Repositories\ConfigRepository;
 use App\Repositories\LogRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 
@@ -29,55 +30,55 @@ class VtvGoService
         $channels = [
             [
                 'path' => 'truyen-hinh-truc-tuyen/vtv1-hd/',
-                'thumbnail' => 'https://upload.wikimedia.org/wikipedia/commons/f/fc/Logo_VTV1_HD.png',
+                'thumbnail' => Storage::disk('public')->url('vtv/vtv1.png'),
                 'title' => 'VTV 1',
                 'chanel_name' => 'VTV 1'
             ],
             [
                 'path' => 'truyen-hinh-truc-tuyen/vtv2-hd/',
-                'thumbnail' => 'https://upload.wikimedia.org/wikipedia/commons/9/91/VTV2%281%29.png',
+                'thumbnail' => Storage::disk('public')->url('vtv/vtv2.png'),
                 'title' => 'VTV 2',
                 'chanel_name' => 'VTV 2'
             ],
             [
                 'path' => 'truyen-hinh-truc-tuyen/vtv3-hd/',
-                'thumbnail' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/VTV3_logo_2013_final.svg/320px-VTV3_logo_2013_final.svg.png',
+                'thumbnail' => Storage::disk('public')->url('vtv/vtv3.png'),
                 'title' => 'VTV 3',
                 'chanel_name' => 'VTV 3'
             ],
             [
                 'path' => 'truyen-hinh-truc-tuyen/vtv4-hd/',
-                'thumbnail' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/VTV3_logo_2013_final.svg/320px-VTV3_logo_2013_final.svg.png',
+                'thumbnail' => Storage::disk('public')->url('vtv/vtv4.png'),
                 'title' => 'VTV 4',
                 'chanel_name' => 'VTV 4'
             ],
             [
                 'path' => 'truyen-hinh-truc-tuyen/vtv5-hd/',
-                'thumbnail' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/VTV3_logo_2013_final.svg/320px-VTV3_logo_2013_final.svg.png',
+                'thumbnail' => Storage::disk('public')->url('vtv/vtv5.png'),
                 'title' => 'VTV 5',
                 'chanel_name' => 'VTV 5'
             ],
             [
                 'path' => 'truyen-hinh-truc-tuyen/vtv9-hd/',
-                'thumbnail' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/VTV3_logo_2013_final.svg/320px-VTV3_logo_2013_final.svg.png',
+                'thumbnail' => Storage::disk('public')->url('vtv/vtv9.png'),
                 'title' => 'VTV 9',
                 'chanel_name' => 'VTV 9'
             ],
             [
                 'path' => 'truyen-hinh-truc-tuyen/thvl1-hd/',
-                'thumbnail' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/VTV3_logo_2013_final.svg/320px-VTV3_logo_2013_final.svg.png',
+                'thumbnail' => Storage::disk('public')->url('vtv/thvl1.png'),
                 'title' => 'THVL 1 HD',
                 'chanel_name' => 'THVL 1 HD'
             ],
             [
                 'path' => 'truyen-hinh-truc-tuyen/vtc1-hd/',
-                'thumbnail' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/VTV3_logo_2013_final.svg/320px-VTV3_logo_2013_final.svg.png',
+                'thumbnail' => Storage::disk('public')->url('vtv/vtc1.png'),
                 'title' => 'VTC 1',
                 'chanel_name' => 'VTC 1'
             ],
             [
                 'path' => 'truyen-hinh-truc-tuyen/vtc13-hd/',
-                'thumbnail' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/VTV3_logo_2013_final.svg/320px-VTV3_logo_2013_final.svg.png',
+                'thumbnail' => Storage::disk('public')->url('vtv/vtc13.png'),
                 'title' => 'VTC 13',
                 'chanel_name' => 'VTC 13'
             ]

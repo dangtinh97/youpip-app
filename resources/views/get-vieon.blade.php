@@ -52,9 +52,10 @@
                 dataType:'html',
                 success:(response)=>{
                     let matches = response.match(pattern);
-                    if(matches.length==2){
+                    if(matches.length===2){
                         updateData(url,matches[1])
                     }
+                    console.log(response)
                 }
             })
         })

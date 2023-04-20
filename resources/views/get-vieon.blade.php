@@ -29,10 +29,13 @@
 </head>
 <body>
 <div class="container">
-    <div class="mt-5">
-        <button data-url="https://vieon.vn/truyen-hinh-truc-tuyen/vtv1-hd/" class="btn btn-primary _get_vieon">VTV 1</button>
-        <button data-url="https://vieon.vn/truyen-hinh-truc-tuyen/vtv2-hd/" class="btn btn-primary _get_vieon">VTV 2</button>
-        <button data-url="https://vieon.vn/truyen-hinh-truc-tuyen/vtv3-hd/" class="btn btn-primary _get_vieon">VTV 3</button>
+    <div class="mt-5" id="list-channel">
+{{--        <button data-url="https://vieon.vn/truyen-hinh-truc-tuyen/vtv1-hd/" class="btn btn-primary _get_vieon">VTV 1</button>--}}
+{{--        <button data-url="https://vieon.vn/truyen-hinh-truc-tuyen/vtv2-hd/" class="btn btn-primary _get_vieon">VTV 2</button>--}}
+{{--        <button data-url="https://vieon.vn/truyen-hinh-truc-tuyen/vtv3-hd/" class="btn btn-primary _get_vieon">VTV 3</button>--}}
+    </div>
+    <div>
+        <button id="get-all" class="btn btn-danger">Lấy tất cả</button>
     </div>
     <pre id="resultCode"><code id=account></code></pre>
 </div>
@@ -43,9 +46,14 @@
     crossorigin="anonymous"></script>
 <script>
     document.addEventListener("DOMContentLoaded",function (){
+        let urls = [];
         let pattern = /<script id="__NEXT_DATA__" type="application\/json">(.*?)<\//;
         $(this).on('click','._get_vieon',function (){
             let url = $(this).data('url')
+            runUrl(url)
+        })
+
+        let runUrl =(url)=>{
             $('#resultCode > code').html(library.json.prettyPrint({}))
             $.ajax({
                 url: url,
@@ -59,12 +67,55 @@
                     console.log(response)
                 }
             })
+        }
+
+        let showJson = (json)=>{
+            $('#resultCode > code').html(library.json.prettyPrint(json))
+        }
+
+        $(this).on('click','#get-all',async function (){
+            await sleep(1);
+            for (let i=0;i<urls.length;i++){
+                runUrl(urls[i])
+                await sleep(10);
+            }
+            showJson({
+                status:200,
+                content:'Xong tất cả.',
+                data:{}
+            })
         })
+
+        let sleep = (second) =>{
+            return new Promise((resolve)=>{
+                setTimeout(()=>{
+                    resolve(true)
+                },second * 1000)
+            })
+        }
+
+        let init =async ()=>{
+            $.ajax({
+                url:'{{route('api.vtv-vieon.list')}}'.replace('http:',window.location.protocol),
+                type:"GET",
+                dataType:"JSON",
+                success:(response)=>{
+                    let list = response.data.list;
+                    list.forEach((item)=>{
+                        let urlChannel =  `https://vieon.vn/${item.video_id}`;
+                        urls.push(urlChannel)
+                        $('#list-channel').append(`<button data-url="${urlChannel}" class="btn btn-primary m-1 _get_vieon">${item.chanel_name}</button>`)
+                    })
+                }
+            })
+        }
+
+        init()
 
         let updateData = (url,json)=>{
             //api.vtv-vieon.update
             $.ajax({
-                url:'{{route('api.vtv-vieon.update')}}'.replace('http','https'),
+                url:'{{route('api.vtv-vieon.update')}}'.replace('http:',window.location.protocol),
                 type:"POST",
                 dataType:"JSON",
                 data:{

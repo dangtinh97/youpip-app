@@ -44,6 +44,42 @@ class VtvGoService
                 'thumbnail' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/VTV3_logo_2013_final.svg/320px-VTV3_logo_2013_final.svg.png',
                 'title' => 'VTV 3',
                 'chanel_name' => 'VTV 3'
+            ],
+            [
+                'path' => 'truyen-hinh-truc-tuyen/vtv4-hd/',
+                'thumbnail' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/VTV3_logo_2013_final.svg/320px-VTV3_logo_2013_final.svg.png',
+                'title' => 'VTV 4',
+                'chanel_name' => 'VTV 4'
+            ],
+            [
+                'path' => 'truyen-hinh-truc-tuyen/vtv5-hd/',
+                'thumbnail' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/VTV3_logo_2013_final.svg/320px-VTV3_logo_2013_final.svg.png',
+                'title' => 'VTV 5',
+                'chanel_name' => 'VTV 5'
+            ],
+            [
+                'path' => 'truyen-hinh-truc-tuyen/vtv9-hd/',
+                'thumbnail' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/VTV3_logo_2013_final.svg/320px-VTV3_logo_2013_final.svg.png',
+                'title' => 'VTV 9',
+                'chanel_name' => 'VTV 9'
+            ],
+            [
+                'path' => 'truyen-hinh-truc-tuyen/thvl1-hd/',
+                'thumbnail' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/VTV3_logo_2013_final.svg/320px-VTV3_logo_2013_final.svg.png',
+                'title' => 'THVL 1 HD',
+                'chanel_name' => 'THVL 1 HD'
+            ],
+            [
+                'path' => 'truyen-hinh-truc-tuyen/vtc1-hd/',
+                'thumbnail' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/VTV3_logo_2013_final.svg/320px-VTV3_logo_2013_final.svg.png',
+                'title' => 'VTC 1',
+                'chanel_name' => 'VTC 1'
+            ],
+            [
+                'path' => 'truyen-hinh-truc-tuyen/vtc13-hd/',
+                'thumbnail' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/VTV3_logo_2013_final.svg/320px-VTV3_logo_2013_final.svg.png',
+                'title' => 'VTC 13',
+                'chanel_name' => 'VTC 13'
             ]
         ];
 

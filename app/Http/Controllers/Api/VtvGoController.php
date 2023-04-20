@@ -37,4 +37,14 @@ class VtvGoController extends Controller
 
         return response()->json($response->toArray());
     }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function index(): JsonResponse
+    {
+        $list = $this->vtvGoService->listChannel();
+
+        return response()->json($list->toArray());
+    }
 }

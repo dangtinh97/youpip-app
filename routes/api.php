@@ -71,3 +71,4 @@ Route::controller(ChatController::class)
     });
 
 Route::post('/vtv-vieon',[\App\Http\Controllers\Api\VtvGoController::class,'update'])->name('api.vtv-vieon.update');
+Route::get('/vtv-vieon-channel',[\App\Http\Controllers\Api\VtvGoController::class,'index'])->name('api.vtv-vieon.list');

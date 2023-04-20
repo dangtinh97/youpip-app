@@ -85,18 +85,10 @@ class VtvGoService
 
         if ($find instanceof Log) {
             $urlPlay = $find->data ?? '';
-            $data = Http::withOptions([
-                'proxy' => $proxy
-            ])->get($urlPlay);
-            if ($data->status() == 200 && str_contains($data->body(), "#EXTM3U")) {
-                return new ResponseSuccess([
-                    'url' => $urlPlay
-                ]);
-            }
-            $this->logRepository->deleteWhere([
-                'type' => 'VTV'.$url,
+
+            return new ResponseSuccess([
+                'url' => $urlPlay
             ]);
-            $find = null;
         }
 
         if (!$find instanceof Log) {

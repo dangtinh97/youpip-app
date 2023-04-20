@@ -25,4 +25,16 @@ class VtvGoController extends Controller
 
         return response()->json($response->toArray());
     }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(Request $request): JsonResponse
+    {
+        $response = $this->vtvGoService->updateVieOn($request->get('url'), $request->get('json'));
+
+        return response()->json($response->toArray());
+    }
 }

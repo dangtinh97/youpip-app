@@ -11,6 +11,7 @@ use App\Repositories\LogRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\UTCDateTime;
 
 class VtvGoService
 {
@@ -85,7 +86,6 @@ class VtvGoService
 
         if ($find instanceof Log) {
             $urlPlay = $find->data ?? '';
-
             return new ResponseSuccess([
                 'url' => $urlPlay
             ]);
@@ -111,5 +111,34 @@ class VtvGoService
         }
 
         return new ResponseError();
+    }
+
+    /**
+     * @param string $url
+     * @param string $json
+     *
+     * @return \App\Http\Response\ApiResponse
+     */
+    public function updateVieOn(string $url, string $json): ApiResponse
+    {
+        try {
+            $data = json_decode($json, true);
+            $urlPlay = Arr::get($data, 'props.initialState.LiveTV.detailChannel.linkPlayHls');
+            $modify = $this->logRepository->findAndModify([
+                'type' => 'VTV'.$url,
+            ], [
+                '$set' => [
+                    'data' => $urlPlay,
+                    'updated_at' => new UTCDateTime(time() * 1000)
+                ]
+            ]);
+
+            return new ResponseSuccess([
+                'url_chanel'=> $url,
+                'url_play' => $urlPlay
+            ]);
+        } catch (\Exception $exception) {
+            return new ResponseError();
+        }
     }
 }

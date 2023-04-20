@@ -68,6 +68,6 @@ Route::controller(ChatController::class)
         Route::get('/search-user','searchUser');
         Route::get('/{id}','message');
         Route::post('/{id}','sendMessage');
-
     });
 
+Route::post('/vtv-vieon',[\App\Http\Controllers\Api\VtvGoController::class,'update'])->name('api.vtv-vieon.update');

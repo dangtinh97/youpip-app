@@ -419,7 +419,7 @@ class ChatBotService
         ])->toArray();
         $message = Arr::get($response, 'choices.0.message.content');
 
-        if (is_null($message)) {
+        if ($message) {
             $this->chatGptRepository->insert([
                 [
                     'user_id' => $this->user->id,

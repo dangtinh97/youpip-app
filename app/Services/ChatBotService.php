@@ -411,16 +411,18 @@ class ChatBotService
         $keys = explode(",", Arr::get($data, 'api_key', $key));
         shuffle($keys);
         $client = OpenAI::client($key = $keys[0] ?? $key);
-        $messages = $messages->map(function ($item) {
-            /** @var \App\Models\CBChatGpt $item */
-            return [
-                'role' => $item->role,
-                'content' => $item->message
-            ];
-        })->add([
-            'role' => 'user',
-            'content' => $text
-        ])->toArray();
+        $messages = $messages
+            ->map(function ($item) {
+                /** @var \App\Models\CBChatGpt $item */
+                return [
+                    'role' => $item->role,
+                    'content' => $item->content
+                ];
+            })->add([
+                'role' => 'user',
+                'content' => $text
+            ])
+            ->toArray();
 
         $response = $client->chat()->create([
             'model' => 'gpt-3.5-turbo',

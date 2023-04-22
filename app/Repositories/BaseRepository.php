@@ -147,4 +147,14 @@ class BaseRepository
     {
         return $this->model::query()->where($cond)->update($data);
     }
+
+    /**
+     * @param array $data
+     *
+     * @return bool
+     */
+    public function insert(array $data): bool
+    {
+        return $this->model::query()->insert($data);
+    }
 }

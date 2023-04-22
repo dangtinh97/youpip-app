@@ -6,11 +6,14 @@ use App\Enums\EBlockChatBot;
 use App\Enums\EStatusChatBot;
 use App\Helper\ChatBotHelper;
 use App\Models\CbUser;
+use App\Repositories\Chatbot\ChatGptRepository;
 use App\Repositories\Chatbot\UserRepository as CbRepository;
+use App\Repositories\ConfigRepository;
 use App\Repositories\LogRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use MongoDB\BSON\UTCDateTime;
+use OpenAI;
 
 class ChatBotService
 {
@@ -18,6 +21,8 @@ class ChatBotService
     const DISCONNECT = "DISCONNECT";
     const MENU = "MENU";
     const CHAT_GPT = 'CHAT_GPT';
+    const END_CHAT_GPT = 'END_CHAT_GPT';
+    const RESET_CHAT_GPT = 'RESET_CHAT_GPT';
 
     /**
      * @var string
@@ -42,7 +47,9 @@ class ChatBotService
      */
     public function __construct(
         protected readonly LogRepository $logRepository,
-        protected readonly CbRepository $cbUserRepository
+        protected readonly CbRepository $cbUserRepository,
+        protected readonly ChatGptRepository $chatGptRepository,
+        protected readonly ConfigRepository $configRepository
     ) {
     }
 
@@ -167,7 +174,64 @@ class ChatBotService
             return $this->menu();
         }
 
+        if ($payload === self::CHAT_GPT) {
+            return $this->chatGPT(EBlockChatBot::CHAT_GPT->value);
+        }
+
+        if ($payload === self::END_CHAT_GPT) {
+            return $this->chatGPT(EBlockChatBot::DEFAULT->value);
+        }
+
+        if ($payload === self::RESET_CHAT_GPT) {
+            return $this->resetChatGpt();
+        }
+
         return [];
+    }
+
+    /**
+     * @return array
+     */
+    private function resetChatGpt(): array
+    {
+        $this->chatGptRepository->deleteWhere([
+            'user_id' => $this->user->id
+        ]);
+
+        return [];
+    }
+
+    /**
+     * @param string $block
+     *
+     * @return array
+     */
+    private function chatGPT(string $block): array
+    {
+        $this->user->update([
+            'block' => $block
+        ]);
+
+        if ($block === EBlockChatBot::CHAT_GPT->value) {
+            return $this->responseSelf(ChatBotHelper::quickReply("Xin chào! Tôi là ChatGPT. Bạn cần tôi giúp gì?", [
+                [
+                    'title' => 'Dừng lại.',
+                    'payload' => self::END_CHAT_GPT
+                ]
+            ]));
+        }
+
+        return $this->responseSelf(ChatBotHelper::quickReply("Đoạn chat đã dừng lại, tiếp tục trò chuyện với người lạ nào.",
+            [
+                [
+                    'title' => '❌ Rời chat!',
+                    'payload' => self::DISCONNECT
+                ],
+                [
+                    'title' => '📁 Chức năng',
+                    'payload' => self::MENU
+                ]
+            ]));
     }
 
     /**
@@ -249,7 +313,11 @@ class ChatBotService
         return $this->responseSelf(ChatBotHelper::quickReply("Chúng tớ đã tìm cho bạn được một người, trò chuyện ngay nhé.",
             [
                 [
-                    'title' => '❌ Rời chat!',
+                    'title' => '📲 Kết nối',
+                    'payload' => self::CONNECT
+                ],
+                [
+                    'title' => '❌ Rời chat',
                     'payload' => self::DISCONNECT
                 ],
                 [
@@ -275,6 +343,15 @@ class ChatBotService
         if (in_array($text, ['#menu', '#help'])) {
             return $this->menu();
         }
+
+        if (in_array($text, ['#resetchat'])) {
+            return $this->connect();
+        }
+
+        if ($this->user->block === EBlockChatBot::CHAT_GPT->value) {
+            return $this->onChatGpt($text);
+        }
+
         if (!$this->connectWith instanceof CbUser) {
             return [];
         }
@@ -284,6 +361,100 @@ class ChatBotService
         );
 
         return [];
+    }
+
+    /**
+     * @param string $text
+     *
+     * @return array[]|\array[][]|string[]|\string[][]
+     */
+    private function onChatGpt(string $text): array
+    {
+        $messages = $this->user->messagesChatGpt;
+        if ($messages->count() >= 20 && $this->sendFrom !== '1343954529053153') {
+            $this->user->update([
+                'block' => EBlockChatBot::DEFAULT->value,
+            ]);
+
+            return $this->responseSelf(ChatBotHelper::quickReply("Đã hết thời gian thử nghiệm chatgpt.", [
+                [
+                    'title' => '📲 Kết nối',
+                    'payload' => self::CONNECT
+                ],
+                [
+                    'title' => '❌ Rời chat',
+                    'payload' => self::DISCONNECT
+                ],
+                [
+                    'title' => '📁 Chức năng',
+                    'payload' => self::MENU
+                ]
+            ]));
+        }
+
+        /** @var \App\Models\Config $config */
+        $config = $this->configRepository->first([
+            'type' => 'OPENAI'
+        ]);
+
+        $data = $config->data ?? [];
+        $key = env('OPENAI_KEY', '');
+        $keys = explode(",", Arr::get($data, 'api_key', $key));
+        shuffle($keys);
+        $client = OpenAI::client($key = $keys[0] ?? $key);
+        $messages = $messages->map(function ($item) {
+            /** @var \App\Models\CBChatGpt $item */
+            return [
+                'role' => $item->role,
+                'content' => $item->message
+            ];
+        })->add([
+            'role' => 'user',
+            'content' => $text
+        ])->toArray();
+
+        $response = $client->chat()->create([
+            'model' => 'gpt-3.5-turbo',
+            'messages' => $messages
+        ])->toArray();
+        $message = Arr::get($response, 'choices.0.message.content');
+
+        if (is_null($message)) {
+            $this->chatGptRepository->insert([
+                [
+                    'user_id' => $this->user->id,
+                    'role' => 'user',
+                    'content' => $text
+                ],
+                [
+                    'user_id' => $this->user->id,
+                    'role' => 'assistant',
+                    'content' => $text
+                ]
+            ]);
+        }
+
+        $quicks = [];
+
+        if ($this->sendFrom === '1343954529053153') {
+            $quicks[] = [
+                'title' => 'Đoạn chat mới',
+                'payload' => self::RESET_CHAT_GPT
+            ];
+        }
+
+        $quicks[] = [
+            'title' => 'Dừng lại',
+            'payload' => self::END_CHAT_GPT
+        ];
+
+        $quicks[] = [
+            'title' => 'Tìm người lạ',
+            'payload' => self::CONNECT
+        ];
+
+        return $this->responseSelf(ChatBotHelper::quickReply($message ?? "Xin lỗi!\nTôi đang gặp sự cố... :(",
+            $quicks));
     }
 
     /**
@@ -398,7 +569,7 @@ class ChatBotService
                 ChatBotHelper::quickReply("Người lạ đã ngắt kết nối với bạn!\nNhấn tìm kiếm để bắt đầu cuộc trò chuyện mới.",
                     [
                         [
-                            'title' => '📲 Tìm kiếm!',
+                            'title' => '📲 Kết nối',
                             'payload' => self::CONNECT
                         ],
                         [

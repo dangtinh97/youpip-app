@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ChatbotController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\YoutubeController;
@@ -72,3 +73,10 @@ Route::controller(ChatController::class)
 
 Route::post('/vtv-vieon',[\App\Http\Controllers\Api\VtvGoController::class,'update'])->name('api.vtv-vieon.update');
 Route::get('/vtv-vieon-channel',[\App\Http\Controllers\Api\VtvGoController::class,'index'])->name('api.vtv-vieon.list');
+
+
+Route::controller(ChatbotController::class)
+    ->prefix('chatbot')
+    ->group(function (){
+        Route::get('/webhooks','verifyWebhook');
+    });

@@ -205,7 +205,8 @@ class ChatBotService
         ]);
 
         $this->user->update([
-            'status' => EStatusChatBot::WAIT->value
+            'status' => EStatusChatBot::WAIT->value,
+            'block' => EBlockChatBot::DEFAULT->value
         ]);
 
         if (!$findWaitConnect instanceof CbUser) {
@@ -223,7 +224,8 @@ class ChatBotService
 
         $findWaitConnect->update([
             'status' => EStatusChatBot::BUSY->value,
-            'fbid_connect' => $this->sendFrom
+            'fbid_connect' => $this->sendFrom,
+            'block' => EBlockChatBot::DEFAULT->value
         ]);
         $this->user->update([
             'status' => EStatusChatBot::BUSY->value,
@@ -389,7 +391,7 @@ class ChatBotService
                 'fbid' => $fbIdConnect
             ], [
                 'status' => EStatusChatBot::FREE->value,
-                'fbid_connect' => null
+                'fbid_connect' => null,
             ]);
 
             $body = $this->body($fbIdConnect,
@@ -417,7 +419,8 @@ class ChatBotService
 
         $this->user->update([
             'status' => EStatusChatBot::FREE->value,
-            'fbid_connect' => null
+            'fbid_connect' => null,
+            'block' => EBlockChatBot::DEFAULT->value
         ]);
 
         return $this->responseSelf(ChatBotHelper::quickReply($messageResponseMe, [

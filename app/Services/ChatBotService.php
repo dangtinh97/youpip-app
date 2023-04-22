@@ -198,7 +198,16 @@ class ChatBotService
             'user_id' => $this->user->id
         ]);
 
-        return [];
+        return $this->responseSelf(ChatBotHelper::quickReply("Cuộc hội thoại mới bắt đầu\nTôi có thể giúp gì cho bạn ?", [
+            [
+                'title' => '❌ Rời chat',
+                'payload' => self::DISCONNECT
+            ],
+            [
+                'title' => '📁 Chức năng',
+                'payload' => self::MENU
+            ]
+        ]));
     }
 
     /**
@@ -429,7 +438,7 @@ class ChatBotService
                 [
                     'user_id' => $this->user->id,
                     'role' => 'assistant',
-                    'content' => $text
+                    'content' => $message
                 ]
             ]);
         }

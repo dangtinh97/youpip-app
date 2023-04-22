@@ -82,4 +82,4 @@ Route::controller(ChatbotController::class)
         Route::post('/webhooks','webhook');
     });
 
-Route::post('/webhook',[ChatController::class,'webhook']);
+Route::post('/webhook',[ChatbotController::class,'webhook']);

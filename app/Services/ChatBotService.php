@@ -67,7 +67,6 @@ class ChatBotService
         /** @var \App\Models\CbUser|null $user */
         $user = $this->cbUserRepository->first([
             'fbid' => $sendFrom,
-            'id' => $this->cbUserRepository->getId()
         ]);
 
         if (!$user instanceof CbUser) {
@@ -75,7 +74,8 @@ class ChatBotService
             $user = $this->cbUserRepository->create([
                 'fbid' => $sendFrom,
                 'block' => EBlockChatBot::DEFAULT->value,
-                'status' => EStatusChatBot::FREE->value
+                'status' => EStatusChatBot::FREE->value,
+                'id' => $this->cbUserRepository->getId()
             ]);
         }
 
@@ -123,7 +123,7 @@ class ChatBotService
             default => "Có gì đó sai sai.",
         };
 
-        if ($status === EStatusChatBot::WAIT->value || $status === EStatusChatBot::BUSY->value) {
+        if ($status === EStatusChatBot::BUSY->value) {
             return $this->responseSelf(ChatBotHelper::quickReply($messageResponseMe, [
                 [
                     'title' => '❌ Rời chat!',

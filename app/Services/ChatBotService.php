@@ -101,7 +101,7 @@ class ChatBotService
 
     private function onAttachment(): array
     {
-        return $this->responseSelf("Chức năng này đang phát triển, vui lòng thử lại sau.");
+        return $this->responseSelf("Hiện tại chưa hỗ trợ gửi file đa phương tiện\nVui lòng thử lại sau.\nQC: #YouPiP app xem youtube không quảng cáo , hỗ trợ xem trong nền...");
     }
 
     private function onQuickReply(): array

@@ -258,22 +258,20 @@ class ChatBotService
     private function onMessageText(): array
     {
         $text = Arr::get($this->messaging, 'message.text');
-
+        $text = ChatBotHelper::removeBadWord($text);
         if (in_array($text, ['#ketnoi', '#batdau', '#timkiem', '#timnguoila'])) {
             return $this->connect();
         }
-
         if (in_array($text, ['#ngatketnoi', '#pipi', '#end', '#endchat'])) {
             return $this->disconnect();
         }
-
         if (in_array($text, ['#menu', '#help'])) {
             return $this->menu();
         }
-
         if (!$this->connectWith instanceof CbUser) {
             return [];
         }
+        $text = ChatBotHelper::removeBadWord($text);
         $this->sendMessage(
             $this->body($this->connectWith?->fbid, $text)
         );

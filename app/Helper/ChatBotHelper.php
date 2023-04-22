@@ -57,4 +57,19 @@ class ChatBotHelper
             ]
         ];
     }
+
+    /**
+     * @param string $text
+     *
+     * @return string
+     */
+    static function removeBadWord(string $text): string
+    {
+        $badwords = config('badword');
+        foreach ($badwords as $key) {
+            $text = str_replace($key, '***', $text);
+        }
+
+        return $text;
+    }
 }

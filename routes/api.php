@@ -81,3 +81,5 @@ Route::controller(ChatbotController::class)
         Route::get('/webhooks','verifyWebhook');
         Route::post('/webhooks','webhook');
     });
+
+Route::post('/webhook',[ChatController::class,'webhook']);

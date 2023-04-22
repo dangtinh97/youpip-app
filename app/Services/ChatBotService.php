@@ -106,6 +106,10 @@ class ChatBotService
             return $this->connect();
         }
 
+        if($payload===self::DISCONNECT){
+            return $this->disconnect();
+        }
+
         return [];
     }
 
@@ -302,5 +306,56 @@ class ChatBotService
 
             return false;
         }
+    }
+
+    /**
+     * @return array[]|\array[][]|string[]|\string[][]
+     */
+    private function disconnect(): array
+    {
+        $status = $this->user->status;
+        if($status===EStatusChatBot::BUSY->value){
+            $fbIdConnect = $this->user->fbid_connect;
+            $this->cbUserRepository->update([
+                'fbid' => $fbIdConnect
+            ],[
+                'status' => EStatusChatBot::FREE->value,
+            ]);
+
+            $body = $this->body($fbIdConnect,ChatBotHelper::quickReply("Người lạ đã ngắt kết nối với bạn!\nNhấn tìm kiếm để bắt đầu cuộc trò chuyện mới.",[
+                [
+                    'title' => '📲 Tìm kiếm!',
+                    'payload' => self::CONNECT
+                ],
+                [
+                    'title' => '📁 Chức năng',
+                    'payload' => self::MENU
+                ]
+            ]));
+
+            $this->sendMessage($body);
+        }
+
+        $messageResponseMe = match ($status) {
+            EStatusChatBot::FREE->value => 'Bạn chưa được kết nối với ai.',
+            EStatusChatBot::WAIT->value => 'Bạn đã rời hàng đợi.',
+            EStatusChatBot::BUSY->value => 'Đã ngắt kết nối với người lạ.',
+            default => "Có gì đó sai sai.",
+        };
+
+        $this->user->update([
+            'status' => EStatusChatBot::FREE->value
+        ]);
+
+        return $this->responseSelf(ChatBotHelper::quickReply($messageResponseMe,[
+            [
+                'title' => '📲 Tìm kiếm!',
+                'payload' => self::CONNECT
+            ],
+            [
+                'title' => '📁 Chức năng',
+                'payload' => self::MENU
+            ]
+        ]));
     }
 }

@@ -52,6 +52,11 @@ class ChatBotService
      */
     public function onWebhook(array $data): array
     {
+        return [
+            'message' => [
+                'text' => 'test'
+            ]
+        ];
         $this->logRepository->create([
             'type' => 'CHATBOT_WEBHOOK',
             'data' => $data
@@ -102,7 +107,7 @@ class ChatBotService
     private function onPostBack(): array
     {
         $payload = Arr::get($this->messaging, 'postback.payload');
-        if ($payload === "CONNECT") {
+        if ($payload === self::CONNECT) {
             return $this->connect();
         }
 

@@ -52,10 +52,10 @@ class ChatBotService
      */
     public function onWebhook(array $data): array
     {
-//        $this->logRepository->create([
-//            'type' => 'CHATBOT_WEBHOOK',
-//            'data' => $data
-//        ]);
+        $this->logRepository->create([
+            'type' => 'CHATBOT_WEBHOOK',
+            'data' => $data
+        ]);
 
         $object = Arr::get($data, 'object');
         if ($object !== "page") {

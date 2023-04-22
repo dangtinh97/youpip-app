@@ -17,6 +17,8 @@ class ChatBotService
     const CONNECT = "CONNECT";
     const DISCONNECT = "DISCONNECT";
     const MENU = "MENU";
+    const CHAT_GPT = 'CHAT_GPT';
+
     /**
      * @var string
      */
@@ -33,6 +35,7 @@ class ChatBotService
      * @var array
      */
     private array $messaging;
+
     /**
      * @param \App\Repositories\LogRepository          $logRepository
      * @param \App\Repositories\Chatbot\UserRepository $cbUserRepository
@@ -40,9 +43,7 @@ class ChatBotService
     public function __construct(
         protected readonly LogRepository $logRepository,
         protected readonly CbRepository $cbUserRepository
-    )
-    {
-
+    ) {
     }
 
     /**
@@ -80,7 +81,7 @@ class ChatBotService
         }
 
         $user->update([
-            'time_latest' => new UTCDateTime(time()*1000)
+            'time_latest' => new UTCDateTime(time() * 1000)
         ]);
 
         $this->user = $user;
@@ -88,8 +89,9 @@ class ChatBotService
         $messaging = (array)Arr::get($data, 'entry.0.messaging.0');
         $this->messaging = $messaging;
         $this->findConnect();
+
         return match (true) {
-            !is_null(Arr::get($messaging,'message.quick_reply.payload')) => $this->onQuickReply(),
+            !is_null(Arr::get($messaging, 'message.quick_reply.payload')) => $this->onQuickReply(),
             !is_null(Arr::get($messaging, 'message.text')) => $this->onMessageText(),
             !is_null(Arr::get($messaging, 'postback')) => $this->onPostBack(),
             Arr::get($messaging, 'attachments.0.type') === "image" => "IMAGE",
@@ -99,24 +101,46 @@ class ChatBotService
 
     private function onQuickReply(): array
     {
-        $payload = Arr::get($this->messaging,'message.quick_reply.payload');
-        if($payload===self::CONNECT){
+        $payload = Arr::get($this->messaging, 'message.quick_reply.payload');
+        if ($payload === self::CONNECT) {
             return $this->connect();
         }
 
-        if($payload===self::DISCONNECT){
+        if ($payload === self::DISCONNECT) {
             return $this->disconnect();
         }
 
-        if($payload===self::MENU){
+        if ($payload === self::MENU) {
             return $this->menu();
         }
+
         return [];
     }
 
     private function menu(): array
     {
-        $urlQc = "";
+        $urlQc = "https://youpip.net/storage/202304/1682189714no-adsjpg.jpg";
+        $generic = ChatBotHelper::generic("1 phút dành cho quảng cáo.\n#YouPip",
+            "- Xem phim không quảng cáo.\n- Xem trong nền\n- ChatGpt", [
+                [
+                    'type' => 'web_url',
+                    'url' => 'https://youpip.net',
+                    'title' => 'Tải ứng dụng'
+                ],
+                [
+                    'type' => 'postback',
+                    'title' => '💬 Tìm người lạ',
+                    'payload' => self::CONNECT
+                ],
+                [
+                    'type' => 'postback',
+                    'title' => 'Chat GPT',
+                    'payload' => self::CHAT_GPT
+                ]
+            ], $urlQc);
+        $body = $this->body($this->sendFrom, $generic);
+        $this->sendMessage($body);
+
         return [];
     }
 
@@ -130,8 +154,12 @@ class ChatBotService
             return $this->connect();
         }
 
-        if($payload===self::DISCONNECT){
+        if ($payload === self::DISCONNECT) {
             return $this->disconnect();
+        }
+
+        if ($payload === self::MENU) {
+            return $this->menu();
         }
 
         return [];
@@ -239,6 +267,9 @@ class ChatBotService
             return $this->disconnect();
         }
 
+        if (in_array($text, ['#menu', '#help'])) {
+            return $this->menu();
+        }
 
         if (!$this->connectWith instanceof CbUser) {
             return [];
@@ -256,13 +287,14 @@ class ChatBotService
      *
      * @return array
      */
-    private function body(string $toFbId,array|string $message=''): array
+    private function body(string $toFbId, array|string $message = ''): array
     {
-        if(is_string($message)){
+        if (is_string($message)) {
             $message = [
                 'text' => $message
             ];
         }
+
         return [
             'recipient' => [
                 'id' => $toFbId
@@ -285,8 +317,9 @@ class ChatBotService
             ];
         }
 
-        $body = $this->body($this->sendFrom,$content);
+        $body = $this->body($this->sendFrom, $content);
         $this->sendMessage($body);
+
         return [
             'message' => $content
         ];
@@ -294,7 +327,7 @@ class ChatBotService
 
     private function findConnect()
     {
-        if(!$connectWithFbId = $this->user->fbid_connect){
+        if (!$connectWithFbId = $this->user->fbid_connect) {
             return;
         }
         $this->connectWith = $this->cbUserRepository->first([
@@ -347,25 +380,27 @@ class ChatBotService
     private function disconnect(): array
     {
         $status = $this->user->status;
-        if($status===EStatusChatBot::BUSY->value){
+        if ($status === EStatusChatBot::BUSY->value) {
             $fbIdConnect = $this->user->fbid_connect;
             $this->cbUserRepository->update([
                 'fbid' => $fbIdConnect
-            ],[
+            ], [
                 'status' => EStatusChatBot::FREE->value,
                 'fbid_connect' => null
             ]);
 
-            $body = $this->body($fbIdConnect,ChatBotHelper::quickReply("Người lạ đã ngắt kết nối với bạn!\nNhấn tìm kiếm để bắt đầu cuộc trò chuyện mới.",[
-                [
-                    'title' => '📲 Tìm kiếm!',
-                    'payload' => self::CONNECT
-                ],
-                [
-                    'title' => '📁 Chức năng',
-                    'payload' => self::MENU
-                ]
-            ]));
+            $body = $this->body($fbIdConnect,
+                ChatBotHelper::quickReply("Người lạ đã ngắt kết nối với bạn!\nNhấn tìm kiếm để bắt đầu cuộc trò chuyện mới.",
+                    [
+                        [
+                            'title' => '📲 Tìm kiếm!',
+                            'payload' => self::CONNECT
+                        ],
+                        [
+                            'title' => '📁 Chức năng',
+                            'payload' => self::MENU
+                        ]
+                    ]));
 
             $this->sendMessage($body);
         }
@@ -382,7 +417,7 @@ class ChatBotService
             'fbid_connect' => null
         ]);
 
-        return $this->responseSelf(ChatBotHelper::quickReply($messageResponseMe,[
+        return $this->responseSelf(ChatBotHelper::quickReply($messageResponseMe, [
             [
                 'title' => '📲 Tìm kiếm!',
                 'payload' => self::CONNECT

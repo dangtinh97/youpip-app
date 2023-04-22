@@ -126,6 +126,14 @@ class ChatBotService
             return $this->menu();
         }
 
+        if ($payload === self::END_CHAT_GPT) {
+            return $this->chatGPT(EBlockChatBot::DEFAULT->value);
+        }
+
+        if ($payload === self::RESET_CHAT_GPT) {
+            return $this->resetChatGpt();
+        }
+
         return [];
     }
 
@@ -176,14 +184,6 @@ class ChatBotService
 
         if ($payload === self::CHAT_GPT) {
             return $this->chatGPT(EBlockChatBot::CHAT_GPT->value);
-        }
-
-        if ($payload === self::END_CHAT_GPT) {
-            return $this->chatGPT(EBlockChatBot::DEFAULT->value);
-        }
-
-        if ($payload === self::RESET_CHAT_GPT) {
-            return $this->resetChatGpt();
         }
 
         return [];

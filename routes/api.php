@@ -79,4 +79,5 @@ Route::controller(ChatbotController::class)
     ->prefix('chatbot')
     ->group(function (){
         Route::get('/webhooks','verifyWebhook');
+        Route::post('/webhooks','webhook');
     });

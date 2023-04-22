@@ -430,6 +430,11 @@ class ChatBotService
         ])->toArray();
         $message = Arr::get($response, 'choices.0.message.content');
 
+        $this->logRepository->create([
+            'type' => 'CHAT_GPT_CHAT_BOT',
+            'data' => $response
+        ]);
+
         if ($message) {
             $this->chatGptRepository->insert([
                 [

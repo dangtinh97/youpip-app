@@ -52,11 +52,6 @@ class ChatBotService
      */
     public function onWebhook(array $data): array
     {
-        return [
-            'message' => [
-                'text' => 'test'
-            ]
-        ];
         $this->logRepository->create([
             'type' => 'CHATBOT_WEBHOOK',
             'data' => $data
@@ -64,7 +59,7 @@ class ChatBotService
 
         $object = Arr::get($data, 'object');
         if ($object !== "page") {
-            return $this->responseSelfText("400|Hệ thống gián đoạn.");
+            return $this->responseSelf("400|Hệ thống gián đoạn.");
         }
 
         $sendFrom = (string)Arr::get($data, 'entry.0.messaging.0.sender.id', '');
@@ -253,8 +248,10 @@ class ChatBotService
             ];
         }
 
+        $body = $this->body($this->sendFrom,$content);
+        $this->sendMessage($body);
         return [
-            "message" => $content
+            'message' => $content
         ];
     }
 

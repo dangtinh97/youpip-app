@@ -94,7 +94,7 @@ class ChatBotService
             !is_null(Arr::get($messaging, 'message.quick_reply.payload')) => $this->onQuickReply(),
             !is_null(Arr::get($messaging, 'message.text')) => $this->onMessageText(),
             !is_null(Arr::get($messaging, 'postback')) => $this->onPostBack(),
-            Arr::get($messaging, 'attachments.0.type') === "image" => $this->onAttachment(),
+            !is_null(Arr::get($messaging, 'message.attachments')) => $this->onAttachment(),
             default => $this->responseSelf("201|Hệ thống gián đoạn.")
         };
     }

@@ -89,11 +89,25 @@ class ChatBotService
         $this->messaging = $messaging;
         $this->findConnect();
         return match (true) {
+            !is_null(Arr::get($messaging,'message.quick_reply.payload')) => $this->onQuickReply(),
             !is_null(Arr::get($messaging, 'message.text')) => $this->onMessageText(),
             !is_null(Arr::get($messaging, 'postback')) => $this->onPostBack(),
             Arr::get($messaging, 'attachments.0.type') === "image" => "IMAGE",
             default => $this->responseSelf("201|Hệ thống gián đoạn.")
         };
+    }
+
+    private function onQuickReply(): array
+    {
+        $payload = Arr::get($this->messaging,'message.quick_reply.payload');
+        if($payload===self::CONNECT){
+            return $this->connect();
+        }
+
+        if($payload===self::DISCONNECT){
+            return $this->disconnect();
+        }
+        return [];
     }
 
     /**

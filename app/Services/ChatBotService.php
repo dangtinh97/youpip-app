@@ -207,6 +207,15 @@ class ChatBotService
     {
         $text = Arr::get($this->messaging, 'message.text');
 
+        if (in_array($text, ['#ketnoi', '#batdau', '#timkiem', '#timnguoila'])) {
+            return $this->connect();
+        }
+
+        if (in_array($text, ['#ngatketnoi', '#pipi', '#end', '#endchat'])) {
+            return $this->disconnect();
+        }
+
+
         if (!$this->connectWith instanceof CbUser) {
             return [];
         }

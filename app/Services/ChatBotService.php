@@ -107,6 +107,16 @@ class ChatBotService
         if($payload===self::DISCONNECT){
             return $this->disconnect();
         }
+
+        if($payload===self::MENU){
+            return $this->menu();
+        }
+        return [];
+    }
+
+    private function menu(): array
+    {
+        $urlQc = "";
         return [];
     }
 

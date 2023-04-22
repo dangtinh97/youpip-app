@@ -26,4 +26,17 @@ class AttachmentController extends Controller
 
         return response()->json($create->toArray());
     }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function store(Request $request)
+    {
+        $file = $request->file('file');
+        $upload = $this->attachmentService->upload($file);
+
+        return response()->json($upload->toArray());
+    }
 }

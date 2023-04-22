@@ -56,6 +56,7 @@ Route::controller(AuthController::class)
     });
 
 Route::post('/attachment',[\App\Http\Controllers\Api\AttachmentController::class,'create'])->middleware('auth');
+Route::post('/attachments',[\App\Http\Controllers\Api\AttachmentController::class,'store']);
 Route::get('/vtv-go/link-play',[\App\Http\Controllers\Api\VtvGoController::class,'linkPlay']);
 //    ->middleware('auth');
 

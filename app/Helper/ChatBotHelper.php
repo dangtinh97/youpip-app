@@ -29,4 +29,32 @@ class ChatBotHelper
             'quick_replies' => $quicks
         ];
     }
+
+    /**
+     * @param string $title
+     * @param string $subtitle
+     * @param array  $buttons
+     * @param string $image
+     *
+     * @return array[]
+     */
+    static function generic(string $title,string $subtitle,array $buttons,string $image=''): array
+    {
+        return [
+            'attachment' => [
+                'type' => 'template',
+                'payload' => [
+                    'template_type' => 'generic',
+                    'elements' => [
+                        [
+                            'title' => $title,
+                            'subtitle' => $subtitle,
+                            'image_url' => $image,
+                            'buttons' => $buttons
+                        ]
+                    ]
+                ]
+            ]
+        ];
+    }
 }

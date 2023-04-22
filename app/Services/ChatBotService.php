@@ -320,6 +320,7 @@ class ChatBotService
                 'fbid' => $fbIdConnect
             ],[
                 'status' => EStatusChatBot::FREE->value,
+                'fbid_connect' => null
             ]);
 
             $body = $this->body($fbIdConnect,ChatBotHelper::quickReply("Người lạ đã ngắt kết nối với bạn!\nNhấn tìm kiếm để bắt đầu cuộc trò chuyện mới.",[
@@ -344,7 +345,8 @@ class ChatBotService
         };
 
         $this->user->update([
-            'status' => EStatusChatBot::FREE->value
+            'status' => EStatusChatBot::FREE->value,
+            'fbid_connect' => null
         ]);
 
         return $this->responseSelf(ChatBotHelper::quickReply($messageResponseMe,[

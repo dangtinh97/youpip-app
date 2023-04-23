@@ -354,7 +354,7 @@ class ChatBotService
         }
 
         if (in_array($text, ['#resetchat'])) {
-            return $this->connect();
+            return $this->resetChatGpt();
         }
 
         if ($this->user->block === EBlockChatBot::CHAT_GPT->value) {

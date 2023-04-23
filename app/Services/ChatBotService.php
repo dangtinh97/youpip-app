@@ -379,7 +379,6 @@ class ChatBotService
      */
     private function onChatGpt(string $text): array
     {
-        return [];
         $messages = $this->user->messagesChatGpt;
         if ($messages->count() >= 20 && $this->sendFrom !== '1343954529053153') {
             $this->user->update([

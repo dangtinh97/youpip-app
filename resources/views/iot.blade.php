@@ -74,7 +74,7 @@
     document.addEventListener("DOMContentLoaded",function (){
         $('input[id*=btn-]').attr('disabled',true).prop('checked', false)
         // var ws = new WebSocket('ws://' + 'localhost:8080' + '/control?code=PJKIZWUHVOVJNZH');
-        var ws = new WebSocket('ws://' + 'youpip.net' + '/control?code=PJKIZWUHVOVJNZH');
+        var ws = new WebSocket('ws://' + 'youpip.net:8080' + '/control?code=PJKIZWUHVOVJNZH');
         let esp8266Connected = false
         ws.addEventListener("open",()=>{
             $('#status').html('Open')

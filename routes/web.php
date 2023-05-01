@@ -20,3 +20,6 @@ Route::get('/', function () {
 Route::get('/vieon',function (){
     return view('get-vieon');
 });
+Route::get('/iot',function (){
+    return view('iot');
+});

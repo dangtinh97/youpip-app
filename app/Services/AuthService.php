@@ -98,7 +98,7 @@ class AuthService
             'full_name'=> $user->full_name ?? '',
             'token' => $token,
             'short_username' => $user->short_username ?? '',
-            'version_review' => '1.30'
+            'version_review' => ''
         ]);
     }
 }

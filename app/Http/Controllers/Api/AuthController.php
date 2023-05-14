@@ -30,7 +30,7 @@ class AuthController extends Controller
             $username = '';
         }
         $login = $this->authService->login($username);
-        if(!$username){
+        if(empty($username)){
             $this->createChatWithOpenAI();
         }
         return response()->json($login->toArray());

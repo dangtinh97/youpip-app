@@ -160,7 +160,11 @@ class VtvGoService
     {
         try {
             $data = json_decode($json, true);
+
             $urlPlay = Arr::get($data, 'props.initialState.LiveTV.detailChannel.linkPlayHls');
+            if(empty($urlPlay)){
+               return new ResponseError();
+            }
             $modify = $this->logRepository->findAndModify([
                 'type' => 'VTV'.$url,
             ], [

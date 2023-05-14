@@ -52,7 +52,7 @@ Route::controller(PostController::class)
 
 Route::controller(AuthController::class)
     ->group(function (){
-        Route::post('/login','attempt');
+        Route::post('/login','attempt2');
     });
 
 Route::post('/attachment',[\App\Http\Controllers\Api\AttachmentController::class,'create'])->middleware('auth');

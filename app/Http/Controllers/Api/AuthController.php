@@ -22,9 +22,8 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function attempt(Request $request): JsonResponse
+    public function attempt2(Request $request): JsonResponse
     {
-
         $username = (string)$request->get('username');
         if(strlen($username)<5){
             $username = '';

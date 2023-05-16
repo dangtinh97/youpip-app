@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\EStatusApi;
 use App\Enums\ETypeMessage;
+use App\Helper\StrHelper;
 use App\Http\Response\ApiResponse;
 use App\Http\Response\ResponseError;
 use App\Http\Response\ResponseSuccess;
@@ -216,17 +217,15 @@ class ChatService
     public function joinRoom(string $userOid): ApiResponse
     {
         /** @var \App\Models\User $userFind */
-        $userFind = $this->userRepository->first([
-            '$or' => [
-                [
-                    'short_username' => $userOid
-                ],
-                [
-                    '_id' => new ObjectId($userOid)
-                ]
-            ]
-
-        ]);
+        if(StrHelper::isObjectId($userOid)){
+            $userFind = $this->userRepository->first([
+                '_id' => new ObjectId($userOid)
+            ]);
+        }else{
+            $userFind = $this->userRepository->first([
+                'short_username' => $userOid
+            ]);
+        }
         $withUserId = $userFind->id;
         /** @var \App\Models\User $user */
         $user = Auth::user();

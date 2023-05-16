@@ -7,6 +7,7 @@ use App\Services\AuthService;
 use App\Services\ChatService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -44,5 +45,15 @@ class AuthController extends Controller
         $this->chatService->joinRoom($userOid);
     }
 
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function tokenFCM(Request $request): JsonResponse
+    {
+        $response = $this->authService->updateTokenPush((string)$request->get('token'));
 
+        return response()->json($response->toArray());
+    }
 }

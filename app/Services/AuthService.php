@@ -101,4 +101,15 @@ class AuthService
             'version_review' => ''
         ]);
     }
+
+    public function updateTokenPush(string $token):ApiResponse
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        $this->userRepository->update(['id' => $user->id],[
+            'token_fcm' => $token
+        ]);
+        return new ResponseSuccess();
+    }
 }

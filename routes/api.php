@@ -83,3 +83,4 @@ Route::controller(ChatbotController::class)
     });
 
 Route::post('/webhook',[ChatbotController::class,'webhook']);
+Route::post('/token-fcm',[AuthController::class,'tokenFCM'])->middleware('auth');

@@ -217,7 +217,15 @@ class ChatService
     {
         /** @var \App\Models\User $userFind */
         $userFind = $this->userRepository->first([
-            '_id' => new ObjectId($userOid)
+            '$or' => [
+                [
+                    'short_username' => $userOid
+                ],
+                [
+                    '_id' => new ObjectId($userOid)
+                ]
+            ]
+
         ]);
         $withUserId = $userFind->id;
         /** @var \App\Models\User $user */

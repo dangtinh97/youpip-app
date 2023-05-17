@@ -128,25 +128,6 @@ class VtvGoService
             ]);
         }
 
-        if (!$find instanceof Log) {
-            $urlNode = env('URL_NODE', 'http://youpip.net:3003');
-            $response = Http::get("$urlNode/vtv?url={$url}&proxy={$proxy}")->json();
-            preg_match('/<script id="__NEXT_DATA__" type="application\/json">(.*?)<\//', $response['data'], $matches);
-            if (count($matches) != 2) {
-                return new ResponseError();
-            }
-            $data = json_decode($matches[1], true);
-            $urlPlay = Arr::get($data, 'props.initialState.LiveTV.detailChannel.linkPlayHls');
-            $this->logRepository->create([
-                'type' => 'VTV'.$url,
-                'data' => $urlPlay
-            ]);
-
-            return new ResponseSuccess([
-                'url' => $urlPlay
-            ]);
-        }
-
         return new ResponseError();
     }
 

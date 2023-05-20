@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginWorkMemoRequest;
 use App\Services\AuthService;
 use App\Services\ChatService;
 use Illuminate\Http\JsonResponse;
@@ -55,5 +56,17 @@ class AuthController extends Controller
         $response = $this->authService->updateTokenPush((string)$request->get('token'));
 
         return response()->json($response->toArray());
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function workMemoLogin(LoginWorkMemoRequest $request): JsonResponse
+    {
+        $login = $this->authService->workMemoLogin($request->only(['email', 'password']));
+
+        return response()->json($login->toArray());
     }
 }

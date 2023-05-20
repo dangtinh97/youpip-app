@@ -13,11 +13,13 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @property int    $id
  * @property string $full_name
  * @property string  $short_username
+ * @property bool $verify_account
+ * @property string $email
  */
 class User extends Authenticatable implements JWTSubject
 {
     protected $collection = 'users';
-    protected $fillable = ['username','id','password','short_username','token_fcm'];
+    protected $fillable = ['username','id','password','short_username','token_fcm','email','verify_account'];
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.

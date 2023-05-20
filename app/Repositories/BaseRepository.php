@@ -29,12 +29,16 @@ class BaseRepository
     /**
      * @param array $cond
      * @param array $column
+     * @param array $sort
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function find(array $cond, array $column = ['*']): Collection
+    public function find(array $cond, array $column = ['*'], array $sort = ['_id' => 'asc']): Collection
     {
-        return $this->model::query()->where($cond)->select($column)->get();
+        $builder = $this->model::query();
+        $builder->orderBy(array_key_first($sort), array_values($sort)[0]);
+
+        return $builder->where($cond)->select($column)->get();
     }
 
     /**

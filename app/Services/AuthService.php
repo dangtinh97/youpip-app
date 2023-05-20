@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use App\Http\Response\ApiResponse;
+use App\Http\Response\ResponseError;
 use App\Http\Response\ResponseSuccess;
 use App\Models\User;
 use App\Repositories\UserRepository;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -102,14 +104,56 @@ class AuthService
         ]);
     }
 
-    public function updateTokenPush(string $token):ApiResponse
+    /**
+     * @param string $token
+     *
+     * @return \App\Http\Response\ApiResponse
+     */
+    public function updateTokenPush(string $token): ApiResponse
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        $this->userRepository->update(['id' => $user->id],[
+        $this->userRepository->update(['id' => $user->id], [
             'token_fcm' => $token
         ]);
+
         return new ResponseSuccess();
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return \App\Http\Response\ApiResponse
+     */
+    public function workMemoLogin(array $data): ApiResponse
+    {
+        $email = Arr::get($data, 'email');
+        /** @var User|null $user */
+        $user = $this->userRepository->first([
+            'email' => $email
+        ]);
+        if (!$user instanceof User) {
+            /** @var User $user */
+            $user = $this->userRepository->create([
+                'id' => $this->userRepository->getId(),
+                'email' => $email,
+                'password' => Hash::make(Arr::get($data, 'password')),
+                'verify_account' => true
+            ]);
+        } else {
+            $login = Auth::attempt($data);
+            if (!$login) {
+                return new ResponseError(400, 'Thông tin đăng nhập không hợp lệ');
+            }
+        }
+        $token = Auth::login($user);
+
+        return new ResponseSuccess([
+            'email' => $email,
+            'token' => $token,
+            '_id' => $user->_id,
+            'id' => $user->id
+        ]);
     }
 }

@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ChatbotController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\PostController;
+use App\Http\Controllers\Api\WorkMemoController;
 use App\Http\Controllers\Api\YoutubeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -85,3 +86,12 @@ Route::controller(ChatbotController::class)
 
 Route::post('/webhook',[ChatbotController::class,'webhook']);
 Route::post('/token-fcm',[AuthController::class,'tokenFCM'])->middleware('auth');
+
+
+Route::post('/work-memo/login',[AuthController::class,'workMemoLogin']);
+Route::prefix('/work-memo')
+    ->middleware('auth')
+    ->group(function (){
+        Route::post('/boards',[WorkMemoController::class,'storeBoard']);
+        Route::get('/boards',[WorkMemoController::class,'index']);
+});

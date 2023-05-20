@@ -28,7 +28,6 @@ class WorkMemoController extends Controller
             $result = $this->workMemoService->storeBoard($title);
         }
 
-
         return response()->json($result->toArray());
     }
 
@@ -40,5 +39,30 @@ class WorkMemoController extends Controller
         $index = $this->workMemoService->index();
 
         return response()->json($index->toArray());
+    }
+
+    /**
+     * @param int                      $id
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function storeListWork(int $id,Request $request): JsonResponse
+    {
+        $store = $this->workMemoService->storeListWork($id,(string)$request->get('title'));
+
+        return response()->json($store->toArray());
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function detailBoard(int $id): JsonResponse
+    {
+        $detail = $this->workMemoService->detailBoard($id);
+
+        return response()->json($detail->toArray());
     }
 }

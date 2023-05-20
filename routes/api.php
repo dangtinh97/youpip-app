@@ -94,4 +94,6 @@ Route::prefix('/work-memo')
     ->group(function (){
         Route::post('/boards',[WorkMemoController::class,'storeBoard']);
         Route::get('/boards',[WorkMemoController::class,'index']);
+        Route::post('/boards/{id}/list-work',[WorkMemoController::class,'storeListWork']);
+        Route::get('/boards/{id}',[WorkMemoController::class,'detailBoard']);
 });

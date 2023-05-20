@@ -3,9 +3,12 @@
 namespace App\Services;
 
 use App\Http\Response\ApiResponse;
+use App\Http\Response\ResponseError;
 use App\Http\Response\ResponseSuccess;
+use App\Models\Board;
 use App\Repositories\Work\BoardRepository;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use MongoDB\BSON\ObjectId;
 
 class WorkMemoService
@@ -21,10 +24,15 @@ class WorkMemoService
      */
     public function storeBoard(string $title): ApiResponse
     {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
         /** @var \App\Models\Board $create */
         $create = $this->boardRepository->create([
             'id' => $this->boardRepository->getId(),
+            'user_id' => $user->id,
             'title' => $title,
+            'active' => true,
             'data' => [
                 [
                     '_id' => new ObjectId(),
@@ -43,8 +51,9 @@ class WorkMemoService
                 ],
             ]
         ]);
-
+        $this->setActive($create->id,$user->id);
         $dataCreate = $create->toArray();
+
         $dataCreate['data'] = array_map(function ($item) {
             $item['_id'] = (string)$item['_id'];
             $item['items'] = [];
@@ -54,15 +63,34 @@ class WorkMemoService
         return new ResponseSuccess($dataCreate);
     }
 
+    public function setActive(int $id, int $userId)
+    {
+        $this->boardRepository->update([
+            'id' => [
+                '$ne' => $id
+            ],
+            'user_id' => $userId
+        ],[
+            'active' => false
+        ]);
+        $this->boardRepository->update([
+            'id' => $id,
+            'user_id' => $userId
+        ],[
+            'active' => true
+        ]);
+
+    }
+
     /**
      * @return \App\Http\Response\ApiResponse
      */
     public function index():ApiResponse
     {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
        $list =  $this->boardRepository->find([
-            '_id'=> [
-                '$exists' => true
-            ]
+            'user_id'=> $user->id
         ],['*'],['_id' => 'desc']);
 
        if($list->isEmpty()){
@@ -90,5 +118,62 @@ class WorkMemoService
     public function getWorkById()
     {
 
+    }
+
+    /**
+     * @param int    $boardId
+     * @param string $title
+     *
+     * @return \App\Http\Response\ApiResponse
+     */
+    public function storeListWork(int $boardId, string $title): ApiResponse
+    {
+        $objectId = new ObjectId();
+        $this->boardRepository->findAndModify([
+            'id' => $boardId
+        ], [
+            '$push' => [
+                'data' => [
+                    '_id' => $objectId,
+                    'title' => $title,
+                    'sort' => 1
+                ]
+            ]
+        ]);
+
+        return new ResponseSuccess([
+            '_id' => (string)$objectId
+        ]);
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return \App\Http\Response\ApiResponse
+     */
+    public function detailBoard(int $id): ApiResponse
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        /** @var \App\Models\Board|null $board */
+        $board = $this->boardRepository->first([
+            'user_id' => $user->id,
+            'id' => $id
+        ]);
+
+        if (!$board instanceof Board) {
+            return new ResponseError(204);
+        }
+
+        $data = $board->toArray();
+        $data['data'] = array_map(function ($item) {
+            $item['_id'] = (string)$item['_id'];
+            $item['items'] = [];
+
+            return $item;
+        }, $data['data']);
+
+        return new ResponseSuccess($data);
     }
 }

@@ -166,6 +166,8 @@ class WorkMemoService
             return new ResponseError(204);
         }
 
+        $this->setActive($id, $user->id);
+
         $data = $board->toArray();
         $data['data'] = array_map(function ($item) {
             $item['_id'] = (string)$item['_id'];

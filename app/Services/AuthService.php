@@ -45,7 +45,7 @@ class AuthService
                 'short_username' => $this->createShortUserName($id),
                 'username' => $username,
                 'password' => Hash::make((string)time()),
-                'os_version' => request()->header('os-version','---')
+                'os_version' => request()->header('version-app','---')
             ]);
         }
 
@@ -95,7 +95,7 @@ class AuthService
     {
         $token = Auth::login($user);
         $user->update([
-           'os_version' => request()->header('os-version','---')
+           'os_version' => request()->header('version-app','---')
         ]);
         return new ResponseSuccess([
             '_id' => $user->_id,

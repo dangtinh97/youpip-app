@@ -93,6 +93,9 @@ class AuthService
     private function user(User $user): ApiResponse
     {
         $token = Auth::login($user);
+        $user->update([
+           'os_version' => request()->header('os-version')
+        ]);
         return new ResponseSuccess([
             '_id' => $user->_id,
             'username' => $user->username,

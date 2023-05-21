@@ -22,7 +22,7 @@ use YouTube\YouTubeDownloader;
 
 class YoutubeService
 {
-    const VERSION_REVIEW = '1.31';
+    const VERSION_REVIEW = '1.37';
     /**
      * @param \App\Repositories\VideoRepository $videoRepository
      * @param \App\Repositories\ViewRepository  $viewRepository

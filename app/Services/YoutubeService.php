@@ -22,6 +22,7 @@ use YouTube\YouTubeDownloader;
 
 class YoutubeService
 {
+    const VERSION_REVIEW = '1.31';
     /**
      * @param \App\Repositories\VideoRepository $videoRepository
      * @param \App\Repositories\ViewRepository  $viewRepository
@@ -90,12 +91,68 @@ class YoutubeService
             ];
         }
 
+        if(request()->header('os-version')==self::VERSION_REVIEW){
+            $suggest = $this->getVideoOfChannel('NoCopyrightSounds');
+            $output = $suggest->data['list'];
+        }
         $this->saveVideo($output);
 
         return new ResponseSuccess([
             'reels' => Arr::collapse($reels),
             'list' => $output,
             'token' => $token
+        ]);
+    }
+
+    private function getVideoOfChannel(string $channel){
+        $url = "https://www.youtube.com/@{$channel}/videos";
+        $body = Http::withHeaders($this->headerCountryCode())
+            ->get($url)->body();
+        preg_match('/var ytInitialData =(.*?);</i', $body, $matches);
+        if (count($matches) !== 2) {
+            return new ResponseSuccess();
+        }
+        $varScript = trim($matches[1]);
+        $data = json_decode($varScript, true);
+        if (!is_array($data)) {
+            return new ResponseSuccess();
+        }
+
+        $contents = (array)Arr::get($data,
+            'contents.twoColumnBrowseResultsRenderer.tabs.1.tabRenderer.content.richGridRenderer.contents', []);
+        foreach ($contents as $content) {
+            /** @var array $content */
+
+            $short = Arr::get($content, 'richSectionRenderer');
+            if ($short) {
+                $reels[] = $this->formatCodeShort($short);
+            }
+            $videoRender = (array)Arr::get($content, 'richItemRenderer.content.videoRenderer');
+            if (!$videoId = Arr::get($videoRender, 'videoId')) {
+                continue;
+            }
+            $publishTime = (string)Arr::get($videoRender, 'publishedTimeText.simpleText');
+            $timeText = (string)Arr::get($videoRender, 'lengthText.simpleText');
+            if (!$publishTime || !$timeText) {
+                continue;
+            }
+
+            $output[] = [
+                'video_oid' => (new ObjectId())->__toString(),
+                'last_oid' => (new ObjectId())->__toString(),
+                'video_id' => $videoId,
+                'thumbnail' => (string)Arr::get($videoRender, 'thumbnail.thumbnails.0.url'),
+                'title' => (string)Arr::get($videoRender, 'title.runs.0.text'),
+                'time_text' => $timeText,
+                'view_count_text' => (string)Arr::get($videoRender, 'viewCountText.simpleText'),
+                'chanel_name' => $channel,
+                'chanel_url' => (string)Arr::get($videoRender,
+                    'longBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl'),
+                'published_time' => $publishTime
+            ];
+        }
+        return new ResponseSuccess([
+            'list' => $output
         ]);
     }
 

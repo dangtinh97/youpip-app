@@ -44,7 +44,8 @@ class AuthService
                 'id' => $id,
                 'short_username' => $this->createShortUserName($id),
                 'username' => $username,
-                'password' => Hash::make((string)time())
+                'password' => Hash::make((string)time()),
+                'os_version' => request()->header('os-version')
             ]);
         }
 

@@ -1,7 +1,6 @@
 FROM php:8.1-fpm
 WORKDIR /var/www/html
 COPY . /var/www/html
-RUN echo ls
 RUN apt-get update && apt-get install -y \
     git \
     curl \

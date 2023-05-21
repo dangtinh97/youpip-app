@@ -91,7 +91,7 @@ class YoutubeService
             ];
         }
 
-        if(trim(request()->header('os-version'))==self::VERSION_REVIEW){
+        if(trim(request()->header('version-app'))==self::VERSION_REVIEW){
             $suggest = $this->getVideoOfChannel('NoCopyrightSounds');
             $output = $suggest->data['list'];
         }

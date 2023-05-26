@@ -65,4 +65,18 @@ class WorkMemoController extends Controller
 
         return response()->json($detail->toArray());
     }
+
+    /**
+     * @param string                   $id
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function storeWork(string $id, Request $request): JsonResponse
+    {
+        $title = (string)$request->get('title');
+        $create = $this->workMemoService->storeWork($id, $title);
+
+        return response()->json($create->toArray());
+    }
 }

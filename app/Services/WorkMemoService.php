@@ -7,14 +7,17 @@ use App\Http\Response\ResponseError;
 use App\Http\Response\ResponseSuccess;
 use App\Models\Board;
 use App\Repositories\Work\BoardRepository;
+use App\Repositories\Work\WorkRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use MongoDB\BSON\ObjectId;
 
 class WorkMemoService
 {
-    public function __construct(protected readonly BoardRepository $boardRepository)
-    {
+    public function __construct(
+        protected readonly BoardRepository $boardRepository,
+        protected readonly WorkRepository $workRepository
+    ) {
     }
 
     /**
@@ -51,12 +54,13 @@ class WorkMemoService
                 ],
             ]
         ]);
-        $this->setActive($create->id,$user->id);
+        $this->setActive($create->id, $user->id);
         $dataCreate = $create->toArray();
 
         $dataCreate['data'] = array_map(function ($item) {
             $item['_id'] = (string)$item['_id'];
             $item['items'] = [];
+
             return $item;
         }, $dataCreate['data']);
 
@@ -70,45 +74,46 @@ class WorkMemoService
                 '$ne' => $id
             ],
             'user_id' => $userId
-        ],[
+        ], [
             'active' => false
         ]);
         $this->boardRepository->update([
             'id' => $id,
             'user_id' => $userId
-        ],[
+        ], [
             'active' => true
         ]);
-
     }
 
     /**
      * @return \App\Http\Response\ApiResponse
      */
-    public function index():ApiResponse
+    public function index(): ApiResponse
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
-       $list =  $this->boardRepository->find([
-            'user_id'=> $user->id
-        ],['*'],['_id' => 'desc']);
+        $list = $this->boardRepository->find([
+            'user_id' => $user->id
+        ], ['*'], ['_id' => 'desc']);
 
-       if($list->isEmpty()){
-           return new ResponseSuccess([
-               'list' => []
-           ]);
-       }
-       $idFirst = $list->first()->_id;
-       $result = $list->map(function ($item){
-           /** @var \App\Models\Board $item */
-           $data = $item->toArray();
-           $data['data'] = array_map(function ($item) {
-               $item['_id'] = (string)$item['_id'];
-               $item['items'] = [];
-               return $item;
-           }, $data['data']);
-           return $data;
-       });
+        if ($list->isEmpty()) {
+            return new ResponseSuccess([
+                'list' => []
+            ]);
+        }
+        $idFirst = $list->first()->_id;
+        $result = $list->map(function ($item) {
+            /** @var \App\Models\Board $item */
+            $data = $item->toArray();
+            $data['data'] = array_map(function ($item) {
+                $item['_id'] = (string)$item['_id'];
+                $item['items'] = [];
+
+                return $item;
+            }, $data['data']);
+
+            return $data;
+        });
 
         return new ResponseSuccess([
             'list' => $result->toArray()
@@ -117,7 +122,6 @@ class WorkMemoService
 
     public function getWorkById()
     {
-
     }
 
     /**
@@ -166,16 +170,45 @@ class WorkMemoService
             return new ResponseError(204);
         }
 
+        $works = $this->workRepository->find([
+            'board_id' => $id
+        ]);
+
         $this->setActive($id, $user->id);
 
         $data = $board->toArray();
-        $data['data'] = array_map(function ($item) {
+        $data['data'] = array_map(function ($item) use ($works) {
             $item['_id'] = (string)$item['_id'];
-            $item['items'] = [];
+            $item['works'] = array_values($works->where('job_list_id', new ObjectId((string)$item['_id']))->toArray());
 
             return $item;
         }, $data['data']);
 
         return new ResponseSuccess($data);
+    }
+
+    /**
+     * @param string $itemListId
+     * @param string $title
+     *
+     * @return ApiResponse
+     */
+    public function storeWork(string $itemListId, string $title): ApiResponse
+    {
+        /** @var \App\Models\Board $board */
+        $board = $this->boardRepository->first([
+            'data._id' => new ObjectId($itemListId)
+        ]);
+        $boardId = $board->id;
+        /** @var \App\Models\Work $create */
+        $create = $this->workRepository->create([
+            'title' => $title,
+            'board_id' => $boardId,
+            'job_list_id' => new ObjectId($itemListId)
+        ]);
+
+        return new ResponseSuccess([
+            '_id' => $create->_id
+        ]);
     }
 }

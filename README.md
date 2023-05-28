@@ -19,3 +19,5 @@
 - use reverse proxy
 https://www.inmotionhosting.com/support/website/ssl/lets-encrypt-ssl-ubuntu-with-certbot/
 fix nginx: https://stackoverflow.com/questions/35868976/nginx-service-failed-because-the-control-process-exited
+-ubuntu 22.04
+https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-22-04

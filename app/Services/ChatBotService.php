@@ -659,6 +659,6 @@ class ChatBotService
         $lunar = (string)$result[2]."-".(string)$result[1]."-".(string)$result[0];
         $lunar = date('d-m-Y', strtotime($lunar));
 
-        return $this->responseSelf("Hôm nay:\n(DL){$dateSolar}\n(AL){$lunar}\n***Chúc bạn có một ngày học tập và làm việc hiệu quả!***");
+        return $this->responseSelf("Hôm nay:\n(DL){$dateSolar}\n(AL){$lunar}\n\nChúc bạn có một ngày học tập và làm việc hiệu quả!");
     }
 }

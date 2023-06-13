@@ -377,7 +377,7 @@ class ChatBotService
         }
         $find = WhatsCallerHelper::findPhone($mobile);
         if (!empty($find)) {
-            $this->responseSelf(ChatBotHelper::quickReply("Số điện thoại:{$mobile}\nThông tin: {$find}\n\n*** Bảo vệ bạn với Ứng dụng WhatsCallMe: Caller ID & Block \n-Không còn lo bị các cuộc gọi spam quấy rối.\n Chặn bất kỳ ai gọi đến.", [
+            $this->responseSelf(ChatBotHelper::quickReply("Số điện thoại:{$mobile}\nThông tin: {$find}\n\n*** Bảo vệ bạn với Ứng dụng WhatsCallMe: Caller ID & Block \n-Không còn lo bị các cuộc gọi spam quấy rối.\n-Chặn bất kỳ ai gọi đến..\nLink tải app IOS & ANDROID: https://app.whatcallme.com?utm_source=HAUI-CHATBOT", [
                 [
                     'title' => '📲 Kết nối',
                     'payload' => self::CONNECT
@@ -388,7 +388,7 @@ class ChatBotService
                 ]
             ]));
         }else{
-            $this->responseSelf(ChatBotHelper::quickReply("Số điện thoại: {$mobile}\nKhông tìm thấy thông tin.\n\n*** Bảo vệ bạn với Ứng dụng WhatsCallMe: Caller ID & Block \n-Không còn lo bị các cuộc gọi spam quấy rối.\n Chặn bất kỳ ai gọi đến.",
+            $this->responseSelf(ChatBotHelper::quickReply("Số điện thoại: {$mobile}\nKhông tìm thấy thông tin.\n\n*** Bảo vệ bạn với Ứng dụng WhatsCallMe: Caller ID & Block \n-Không còn lo bị các cuộc gọi spam quấy rối.\n-Chặn bất kỳ ai gọi đến.\nLink tải app IOS & ANDROID: https://app.whatcallme.com?utm_source=HAUI-CHATBOT",
                 [
                     [
                         'title' => '📲 Kết nối',

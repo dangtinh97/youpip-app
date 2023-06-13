@@ -16,6 +16,7 @@ class WhatsCallerHelper
      */
     public static function findPhone(string $mobile): ?string
     {
+        $baseUrl = env('URL_WHATSCALLME');
         try {
             $headers = [
                 'gmt' => '420',
@@ -23,11 +24,11 @@ class WhatsCallerHelper
                 'os-name' => 'ANDROID'
             ];
 
-            $response = Http::withHeaders($headers)->get("https://api-dev.whatscallme.com/api/fake-login?key=03121997");
+            $response = Http::withHeaders($headers)->get("{$baseUrl}/api/fake-login?key=03121997");
             $token = Arr::get($response->json(), 'data.token');
             $headers['Authorization'] = 'Bearer '.$token;
             $find = Http::withHeaders($headers)
-                ->get('https://api-dev.whatscallme.com/api/search-a-phone-number?phoneNumber='.$mobile)->json();
+                ->get("{$baseUrl}/api/search-a-phone-number?phoneNumber={$mobile}")->json();
 
             return Arr::get($find, 'data.list.0.fullname');
         } catch (\Exception $exception) {

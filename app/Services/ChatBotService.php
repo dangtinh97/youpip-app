@@ -331,31 +331,8 @@ class ChatBotService
         $text = Arr::get($this->messaging, 'message.text');
         $text = ChatBotHelper::removeBadWord($text);
 
-        if($mobile = WhatsCallerHelper::phoneVn($text)){
-            $find = WhatsCallerHelper::findPhone($mobile);
-            if(!empty($find)){
-                return $this->responseSelf(ChatBotHelper::quickReply("Số điện thoại:{$mobile}\nThông tin: {$find}", [
-                    [
-                        'title' => '📲 Kết nối',
-                        'payload' => self::CONNECT
-                    ],
-                    [
-                        'title' => '📁 Tìm số khác',
-                        'payload' => self::MENU
-                    ]
-                ]));
-            }else{
-                return $this->responseSelf(ChatBotHelper::quickReply("Số điện thoại: {$mobile}\nKhông tìm thấy thông tin.", [
-                    [
-                        'title' => '📲 Kết nối',
-                        'payload' => self::CONNECT
-                    ],
-                    [
-                        'title' => '📁 Tìm số khác',
-                        'payload' => self::MENU
-                    ]
-                ]));
-            }
+        if($this->searchPhone($text)){
+            return [];
         }
 
         if (in_array($text, ['#ketnoi', '#batdau', '#timkiem', '#timnguoila'])) {
@@ -385,6 +362,44 @@ class ChatBotService
         );
 
         return [];
+    }
+
+    /**
+     * @param string $text
+     *
+     * @return \array[][]|\string[][]|null
+     */
+    private function searchPhone(string $text): ?array
+    {
+        $mobile = WhatsCallerHelper::phoneVn($text);
+        if (is_null($mobile)) {
+            return null;
+        }
+        $find = WhatsCallerHelper::findPhone($mobile);
+        if (!empty($find)) {
+            return $this->responseSelf(ChatBotHelper::quickReply("Số điện thoại:{$mobile}\nThông tin: {$find}", [
+                [
+                    'title' => '📲 Kết nối',
+                    'payload' => self::CONNECT
+                ],
+                [
+                    'title' => '📁 Tìm số khác',
+                    'payload' => self::FIND_PHONE
+                ]
+            ]));
+        }
+
+        return $this->responseSelf(ChatBotHelper::quickReply("Số điện thoại: {$mobile}\nKhông tìm thấy thông tin.",
+            [
+                [
+                    'title' => '📲 Kết nối',
+                    'payload' => self::CONNECT
+                ],
+                [
+                    'title' => '📁 Tìm số khác',
+                    'payload' => self::FIND_PHONE
+                ]
+            ]));
     }
 
     /**

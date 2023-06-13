@@ -680,7 +680,7 @@ class ChatBotService
         }
 
         if ($payload === self::FIND_PHONE) {
-            return $this->responseSelf("Vui lòng nhập số điện thoại cần tìm!");
+            return $this->responseSelf("Vui lòng nhập số điện thoại cần tra cứu?");
         }
 
         return [];
@@ -697,7 +697,7 @@ class ChatBotService
                 'payload' => self::LUNAR_CALENDAR
             ],
             [
-                'title' => 'Tra cứu thông tin sđt',
+                'title' => 'Tìm thông tin sđt',
                 'payload' => self::FIND_PHONE
             ],
         ]));

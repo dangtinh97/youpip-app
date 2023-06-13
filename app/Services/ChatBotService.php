@@ -6,6 +6,7 @@ use App\Enums\EBlockChatBot;
 use App\Enums\EStatusChatBot;
 use App\Helper\CalendarHelper;
 use App\Helper\ChatBotHelper;
+use App\Helper\WhatsCallerHelper;
 use App\Models\CbUser;
 use App\Repositories\Chatbot\ChatGptRepository;
 use App\Repositories\Chatbot\UserRepository as CbRepository;
@@ -28,6 +29,7 @@ class ChatBotService
     const MORE_ACTION = 'MORE_ACTION';
 
     const LUNAR_CALENDAR = 'LUNAR_CALENDAR';
+    const FIND_PHONE = 'FIND_PHONE';
     /**
      * @var string
      */
@@ -328,6 +330,34 @@ class ChatBotService
     {
         $text = Arr::get($this->messaging, 'message.text');
         $text = ChatBotHelper::removeBadWord($text);
+
+        if($mobile = WhatsCallerHelper::phoneVn($text)){
+            $find = WhatsCallerHelper::findPhone($mobile);
+            if(!empty($find)){
+                return $this->responseSelf(ChatBotHelper::quickReply("Số điện thoại:{$mobile}\nThông tin: {$find}", [
+                    [
+                        'title' => '📲 Kết nối',
+                        'payload' => self::CONNECT
+                    ],
+                    [
+                        'title' => '📁 Tìm số khác',
+                        'payload' => self::MENU
+                    ]
+                ]));
+            }else{
+                return $this->responseSelf(ChatBotHelper::quickReply("Số điện thoại: {$mobile}\nKhông tìm thấy thông tin.", [
+                    [
+                        'title' => '📲 Kết nối',
+                        'payload' => self::CONNECT
+                    ],
+                    [
+                        'title' => '📁 Tìm số khác',
+                        'payload' => self::MENU
+                    ]
+                ]));
+            }
+        }
+
         if (in_array($text, ['#ketnoi', '#batdau', '#timkiem', '#timnguoila'])) {
             return $this->connect();
         }
@@ -634,15 +664,26 @@ class ChatBotService
             return $this->lunarCalendar();
         }
 
+        if ($payload === self::FIND_PHONE) {
+            return $this->responseSelf("Vui lòng nhập số điện thoại cần tìm!");
+        }
+
         return [];
     }
 
+    /**
+     * @return \array[][]|\string[][]
+     */
     public function moreAction(): array
     {
         return $this->responseSelf(ChatBotHelper::quickReply("Mọi thứ bạn cần!", [
             [
                 'title' => 'âm lịch',
                 'payload' => self::LUNAR_CALENDAR
+            ],
+            [
+                'title' => 'Tra cứu thông tin sđt',
+                'payload' => self::FIND_PHONE
             ],
         ]));
     }

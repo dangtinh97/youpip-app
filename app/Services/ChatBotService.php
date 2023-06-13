@@ -167,6 +167,10 @@ class ChatBotService
             return $this->chatGPT(EBlockChatBot::CHAT_GPT->value);
         }
 
+        if($payload === self::MORE_ACTION) {
+            return $this->moreAction();
+        }
+
         return [];
     }
 
@@ -626,13 +630,9 @@ class ChatBotService
             return $this->resetChatGpt();
         }
 
-        if($payload === self::MORE_ACTION) {
-            return $this->moreAction();
+        if ($payload === self::LUNAR_CALENDAR) {
+            return $this->lunarCalendar();
         }
-
-        if($payload === self::LUNAR_CALENDAR){
-        return $this->lunarCalendar();
-    }
 
         return [];
     }
@@ -642,7 +642,7 @@ class ChatBotService
         return $this->responseSelf(ChatBotHelper::quickReply("Mọi thứ bạn cần!", [
             [
                 'title' => 'âm lịch',
-                'payload' => 'LUNAR_CALENDAR'
+                'payload' => self::LUNAR_CALENDAR
             ],
         ]));
     }
@@ -659,6 +659,6 @@ class ChatBotService
         $lunar = (string)$result[2]."-".(string)$result[1]."-".(string)$result[0];
         $lunar = date('d-m-Y', strtotime($lunar));
 
-        return $this->responseSelf("Hôm nay:\n(DL){$dateSolar}\n(AL){$lunar}");
+        return $this->responseSelf("Hôm nay:\n(DL){$dateSolar}\n(AL){$lunar}\nChúc bạn có một ngày học tập và làm việc hiệu quả!");
     }
 }

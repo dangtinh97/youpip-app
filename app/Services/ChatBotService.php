@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\EBlockChatBot;
 use App\Enums\EStatusChatBot;
+use App\Helper\CalendarHelper;
 use App\Helper\ChatBotHelper;
 use App\Models\CbUser;
 use App\Repositories\Chatbot\ChatGptRepository;
@@ -24,6 +25,9 @@ class ChatBotService
     const END_CHAT_GPT = 'END_CHAT_GPT';
     const RESET_CHAT_GPT = 'RESET_CHAT_GPT';
 
+    const MORE_ACTION = 'MORE_ACTION';
+
+    const LUNAR_CALENDAR = 'LUNAR_CALENDAR';
     /**
      * @var string
      */
@@ -111,32 +115,9 @@ class ChatBotService
         return $this->responseSelf("Hiện tại chưa hỗ trợ gửi file đa phương tiện\nVui lòng thử lại sau.\nQC: #YouPiP app xem youtube không quảng cáo , hỗ trợ xem trong nền...");
     }
 
-    private function onQuickReply(): array
-    {
-        $payload = Arr::get($this->messaging, 'message.quick_reply.payload');
-        if ($payload === self::CONNECT) {
-            return $this->connect();
-        }
-
-        if ($payload === self::DISCONNECT) {
-            return $this->disconnect();
-        }
-
-        if ($payload === self::MENU) {
-            return $this->menu();
-        }
-
-        if ($payload === self::END_CHAT_GPT) {
-            return $this->chatGPT(EBlockChatBot::DEFAULT->value);
-        }
-
-        if ($payload === self::RESET_CHAT_GPT) {
-            return $this->resetChatGpt();
-        }
-
-        return [];
-    }
-
+    /**
+     * @return array
+     */
     private function menu(): array
     {
         $urlQc = "https://youpip.net/storage/202304/1682189714no-adsjpg.jpg";
@@ -154,8 +135,8 @@ class ChatBotService
                 ],
                 [
                     'type' => 'postback',
-                    'title' => 'Chat GPT',
-                    'payload' => self::CHAT_GPT
+                    'title' => 'Nhiều hơn nữa',
+                    'payload' => self::MORE_ACTION
                 ]
             ], $urlQc);
         $body = $this->body($this->sendFrom, $generic);
@@ -620,5 +601,64 @@ class ChatBotService
                 'payload' => self::MENU
             ]
         ]));
+    }
+
+    private function onQuickReply(): array
+    {
+        $payload = Arr::get($this->messaging, 'message.quick_reply.payload');
+        if ($payload === self::CONNECT) {
+            return $this->connect();
+        }
+
+        if ($payload === self::DISCONNECT) {
+            return $this->disconnect();
+        }
+
+        if ($payload === self::MENU) {
+            return $this->menu();
+        }
+
+        if ($payload === self::END_CHAT_GPT) {
+            return $this->chatGPT(EBlockChatBot::DEFAULT->value);
+        }
+
+        if ($payload === self::RESET_CHAT_GPT) {
+            return $this->resetChatGpt();
+        }
+
+        if($payload === self::MORE_ACTION) {
+            return $this->moreAction();
+        }
+
+        if($payload === self::LUNAR_CALENDAR){
+        return $this->lunarCalendar();
+    }
+
+        return [];
+    }
+
+    public function moreAction(): array
+    {
+        return $this->responseSelf(ChatBotHelper::quickReply("Mọi thứ bạn cần!", [
+            [
+                'title' => 'âm lịch',
+                'payload' => 'LUNAR_CALENDAR'
+            ],
+        ]));
+    }
+
+    /**
+     * @return \array[][]|\string[][]
+     */
+    public function lunarCalendar(): array
+    {
+        $calendar = new CalendarHelper();
+        $dateSolar = date('d-m-Y', time());
+        $result = $calendar->convertSolar2Lunar(explode('-', $dateSolar)[0], explode('-', $dateSolar)[1],
+            explode('-', $dateSolar)[2], '7.0');
+        $lunar = (string)$result[2]."-".(string)$result[1]."-".(string)$result[0];
+        $lunar = date('d-m-Y', strtotime($lunar));
+
+        return $this->responseSelf("Hôm nay:\n(DL){$dateSolar}\n(AL){$lunar}");
     }
 }

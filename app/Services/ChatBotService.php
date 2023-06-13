@@ -377,7 +377,7 @@ class ChatBotService
         }
         $find = WhatsCallerHelper::findPhone($mobile);
         if (!empty($find)) {
-            return $this->responseSelf(ChatBotHelper::quickReply("Số điện thoại:{$mobile}\nThông tin: {$find}", [
+            $this->responseSelf(ChatBotHelper::quickReply("Số điện thoại:{$mobile}\nThông tin: {$find}\n\n*** Bảo vệ bạn với Ứng dụng WhatsCallMe: Caller ID & Block \n-Không còn lo bị các cuộc gọi spam quấy rối.\n Chặn bất kỳ ai gọi đến.", [
                 [
                     'title' => '📲 Kết nối',
                     'payload' => self::CONNECT
@@ -387,19 +387,23 @@ class ChatBotService
                     'payload' => self::FIND_PHONE
                 ]
             ]));
+        }else{
+            $this->responseSelf(ChatBotHelper::quickReply("Số điện thoại: {$mobile}\nKhông tìm thấy thông tin.\n\n*** Bảo vệ bạn với Ứng dụng WhatsCallMe: Caller ID & Block \n-Không còn lo bị các cuộc gọi spam quấy rối.\n Chặn bất kỳ ai gọi đến.",
+                [
+                    [
+                        'title' => '📲 Kết nối',
+                        'payload' => self::CONNECT
+                    ],
+                    [
+                        'title' => '📁 Tìm số khác',
+                        'payload' => self::FIND_PHONE
+                    ]
+                ]));
         }
 
-        return $this->responseSelf(ChatBotHelper::quickReply("Số điện thoại: {$mobile}\nKhông tìm thấy thông tin.",
-            [
-                [
-                    'title' => '📲 Kết nối',
-                    'payload' => self::CONNECT
-                ],
-                [
-                    'title' => '📁 Tìm số khác',
-                    'payload' => self::FIND_PHONE
-                ]
-            ]));
+        return $this->responseSelf("");
+
+
     }
 
     /**

@@ -115,7 +115,6 @@ class VtvGoService
         $findConfig = $this->configRepository->first([
             'type' => 'PROXY'
         ]);
-        $proxy = $findConfig['data'];
         /** @var \App\Models\Log|null $find */
         $find = $this->logRepository->last([
             'type' => 'VTV'.$url,

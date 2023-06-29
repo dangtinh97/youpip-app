@@ -10,7 +10,7 @@ services:
       - ./nginx/server.crt:/etc/nginx/server.crt
       - ./nginx/server.key:/etc/nginx/server.key
     ports:
-      - '80:80'
+      - '8000:80'
     networks:
       - backend
   php_pip:

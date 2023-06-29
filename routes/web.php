@@ -23,3 +23,9 @@ Route::get('/vieon',function (){
 Route::get('/iot',function (){
     return view('iot');
 });
+
+Route::get('/test-schedule',function (){
+    $user = \App\Models\User::query()->first();
+    dd($user);
+   dd("a");
+});

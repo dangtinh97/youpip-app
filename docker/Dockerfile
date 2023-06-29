@@ -6,7 +6,10 @@ RUN apt-get update && apt-get install -y \
     curl \
     zip \
     unzip \
-    libssl-dev
+    libssl-dev \
+    supervisor && rm -rf /var/lib/apt/lists/*
+
+COPY ./docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 #RUN apt-get install libssl-dev pkg-config
 # Install the MongoDB driver
@@ -23,5 +26,6 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 
 EXPOSE 9000
+CMD supervisord -n
 
 CMD ["php-fpm"]

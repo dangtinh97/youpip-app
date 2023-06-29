@@ -8,7 +8,8 @@
 ## RUN PROJECT
 - ```cd docker && docker-compose build```
 - ```docker-compose up -d```
-- ```docker exec -it php_pip```
+- ```docker exec -it php_pip bash```
+- ```composer i```
 - ```php artisan jwt:secret```
 - ```php artisan key:generate```
 - ```php artisan storage:link```

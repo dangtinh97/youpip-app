@@ -41,39 +41,41 @@ class CurlLocamosCommand extends Command
      */
     public function handle()
     {
+        $apiText = env('API_LOCAMOS');
 
-        try{
-            $call = Http::withHeaders([
-                'lang' => 'vi',
-                'gmt' => '420'
-            ])->timeout(10)->retry(3, 1000, function (Exception $exception) {
-                $code = $exception->getCode();
-                $html = "API ERROR:\nStatus code: $code";
-                $this->sendNotification($html);
-                return false;
-            })->post(env("API_LOCAMOS"), [
-                "data" => "123",
-                "sign_key" => "7690079b9d363394743c451089b4f508",
-                "type" => "EMAIL",
-                "user_id" => 111,
-                "verify_token" => "DANGTINH", "full_name" => "DANGTINH"
-            ]);
-        }catch (Exception $exception){
-            $this->sendNotification($exception->getMessage());
+        foreach (explode(",", $apiText) as $api) {
+            $api .= "/reset-config-redis";
+
+            try {
+                $call = Http::withHeaders([
+                    'lang' => 'vi',
+                    'gmt' => '420'
+                ])->timeout(10)->retry(3, 1000, function (Exception $exception) use ($api) {
+                    $code = $exception->getCode();
+                    $html = "API ERROR:\nStatus code: $code";
+                    $this->sendNotification($api, $html);
+
+                    return false;
+                })->get($api);
+                if ($call->status() !== 200) {
+                    $this->sendNotification($api, $call->body());
+                }
+            } catch (Exception $exception) {
+                $this->sendNotification($api, $exception->getMessage());
+            }
         }
-
 
         return 0;
     }
 
-    private function sendNotification($text)
+    private function sendNotification(string $apiLink, string $text)
     {
         $chatId = "-902454915";
         $token = env('TOKEN_TELEGRAM');
         $api = "https://api.telegram.org/bot{$token}/sendMessage";
         $curl = Http::post($api, [
             "chat_id" => $chatId,
-            "text" => ($text),
+            "text" => "LINK API: $apiLink\n Error: $text",
             "parse_mode" => "HTML"
         ]);
     }

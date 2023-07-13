@@ -85,6 +85,15 @@ class CurlLocamosCommand extends Command
                     ]
                 ]);
             } catch (Exception $exception) {
+                Log::query()->create([
+                    'type' => 'curl-locamos',
+                    'data' => [
+                        'status' => 500,
+                        'api' => $api,
+                        'time' => time() - $timeStart,
+                    ],
+                    "message" => $exception->getMessage()
+                ]);
                 $this->sendNotification($api, $exception->getMessage());
             }
         }

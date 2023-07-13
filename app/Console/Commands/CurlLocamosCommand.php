@@ -103,7 +103,6 @@ class CurlLocamosCommand extends Command
 
     private function sendNotification(string $apiLink, string $text)
     {
-        return;
         $chatId = "-902454915";
         $token = env('TOKEN_TELEGRAM');
         $api = "https://api.telegram.org/bot{$token}/sendMessage";

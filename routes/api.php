@@ -28,82 +28,95 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::controller(YoutubeController::class)
     ->prefix('youtube')
     ->middleware('auth')
-    ->group(function (){
-        Route::get('/new','videoNew');
-        Route::get('/link-video','linkVideo');
-        Route::get('/suggest','suggest');
-        Route::get('/search','search');
-        Route::get('/suggest-by-video-id','videoSuggest');
-        Route::get('/detail','detailVideo');
+    ->group(function () {
+        Route::get('/new', 'videoNew');
+        Route::get('/link-video', 'linkVideo');
+        Route::get('/suggest', 'suggest');
+        Route::get('/search', 'search');
+        Route::get('/suggest-by-video-id', 'videoSuggest');
+        Route::get('/detail', 'detailVideo');
     });
 
 Route::controller(PostController::class)
     ->prefix('posts')
     ->middleware('auth')
-    ->group(function (){
-        Route::get('/','index');
-        Route::get('/feed','postMe');
-        Route::post('/','create');
-        Route::post("/{id}/reaction",'reaction');
-        Route::delete("/{id}",'delete');
-        Route::delete("/{id}",'show');
-        Route::post("/{id}/comment",'comment');
-        Route::get("/{id}/comment",'listComment');
+    ->group(function () {
+        Route::get('/', 'index');
+        Route::get('/feed', 'postMe');
+        Route::post('/', 'create');
+        Route::post("/{id}/reaction", 'reaction');
+        Route::delete("/{id}", 'delete');
+        Route::delete("/{id}", 'show');
+        Route::post("/{id}/comment", 'comment');
+        Route::get("/{id}/comment", 'listComment');
     });
 
 Route::controller(AuthController::class)
-    ->group(function (){
-        Route::post('/login','attempt2');
+    ->group(function () {
+        Route::post('/login', 'attempt2');
     });
 
-Route::post('/attachment',[\App\Http\Controllers\Api\AttachmentController::class,'create'])->middleware('auth');
-Route::post('/attachments',[\App\Http\Controllers\Api\AttachmentController::class,'store']);
-Route::get('/vtv-go/link-play',[\App\Http\Controllers\Api\VtvGoController::class,'linkPlay']);
-Route::post('/vieon/link-play',[\App\Http\Controllers\Api\VtvGoController::class,'linkPlay']);
+Route::post('/attachment',
+    [\App\Http\Controllers\Api\AttachmentController::class, 'create'])
+    ->middleware('auth');
+Route::post('/attachments',
+    [\App\Http\Controllers\Api\AttachmentController::class, 'store']);
+Route::get('/vtv-go/link-play',
+    [\App\Http\Controllers\Api\VtvGoController::class, 'linkPlay']);
+Route::post('/vieon/link-play',
+    [\App\Http\Controllers\Api\VtvGoController::class, 'linkPlay']);
 //    ->middleware('auth');
 
 Route::controller(ChatController::class)
     ->prefix('/chats')
     ->middleware('auth')
-    ->group(function (){
-        Route::get('/','listChat');
-        Route::get("/chat-gpt",'chatGpt');
-        Route::get('/join-room','joinRoom');
-        Route::get('/search-user','searchUser');
-        Route::get('/{id}','message');
-        Route::post('/{id}','sendMessage');
+    ->group(function () {
+        Route::get('/', 'listChat');
+        Route::get("/chat-gpt", 'chatGpt');
+        Route::get('/join-room', 'joinRoom');
+        Route::get('/search-user', 'searchUser');
+        Route::get('/{id}', 'message');
+        Route::post('/{id}', 'sendMessage');
     });
 
-Route::post('/vtv-vieon',[\App\Http\Controllers\Api\VtvGoController::class,'update'])->name('api.vtv-vieon.update');
-Route::get('/vtv-vieon-channel',[\App\Http\Controllers\Api\VtvGoController::class,'index'])->name('api.vtv-vieon.list');
+Route::post('/vtv-vieon',
+    [\App\Http\Controllers\Api\VtvGoController::class, 'update'])
+    ->name('api.vtv-vieon.update');
+Route::get('/vtv-vieon-channel',
+    [\App\Http\Controllers\Api\VtvGoController::class, 'index'])
+    ->name('api.vtv-vieon.list');
 
 Route::controller(ChatbotController::class)
     ->prefix('chatbot')
-    ->group(function (){
-        Route::get('/webhooks','verifyWebhook');
-        Route::post('/webhooks','webhook');
+    ->group(function () {
+        Route::get('/webhooks', 'verifyWebhook');
+        Route::post('/webhooks', 'webhook');
     });
 
-Route::post('/webhook',[ChatbotController::class,'webhook']);
-Route::post('/token-fcm',[AuthController::class,'tokenFCM'])->middleware('auth');
+Route::post('/webhook', [ChatbotController::class, 'webhook']);
+Route::post('/token-fcm', [AuthController::class, 'tokenFCM'])
+    ->middleware('auth');
 
 
-Route::post('/work-memo/login',[AuthController::class,'workMemoLogin']);
+Route::post('/work-memo/login', [AuthController::class, 'workMemoLogin']);
 Route::prefix('/work-memo')
     ->middleware('auth')
-    ->group(function (){
-        Route::post('/boards',[WorkMemoController::class,'storeBoard']);
-        Route::get('/boards',[WorkMemoController::class,'index']);
-        Route::post('/boards/{id}/list-work',[WorkMemoController::class,'storeListWork']);
-        Route::get('/boards/{id}',[WorkMemoController::class,'detailBoard']);
-        Route::post('/list-work/{id}/works',[WorkMemoController::class,'storeWork']);
-});
+    ->group(function () {
+        Route::post('/boards', [WorkMemoController::class, 'storeBoard']);
+        Route::get('/boards', [WorkMemoController::class, 'index']);
+        Route::post('/boards/{id}/list-work',
+            [WorkMemoController::class, 'storeListWork']);
+        Route::get('/boards/{id}', [WorkMemoController::class, 'detailBoard']);
+        Route::post('/list-work/{id}/works',
+            [WorkMemoController::class, 'storeWork']);
+    });
 
-Route::get('curl-locamos',function(){
-   $data = \App\Models\Log::query()
-       ->where(['type' => 'curl-locamos'])
-       ->orderByDesc('_id')
-       ->limit(10)
-       ->get();
-   return response()->json($data);
+Route::get('curl-locamos', function () {
+    $data = \App\Models\Log::query()
+        ->where(['type' => 'curl-locamos'])
+        ->orderByDesc('_id')
+        ->limit(10)
+        ->get()
+        ->toArray();
+    return response()->json($data);
 });

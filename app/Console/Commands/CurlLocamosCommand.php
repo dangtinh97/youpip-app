@@ -8,6 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
+use MongoDB\BSON\ObjectId;
 
 class CurlLocamosCommand extends Command
 {
@@ -43,10 +44,24 @@ class CurlLocamosCommand extends Command
     public function handle()
     {
         $apiText = env('API_LOCAMOS');
+        $ids = Log::query()->where([
+            'type' => 'curl-locamos',
+        ])->orderByDesc('_id')->limit(100)->pluck('_id')->toArray();
+
+        if(count($ids)>0){
+            Log::query()->where([
+                'type' => 'curl-locamos',
+                '_id' => [
+                    '$nin' => array_map(function($id){
+                        return new ObjectId($id);
+                    },$ids)
+                ]
+            ])->delete();
+        }
 
         foreach (explode(",", $apiText) as $api) {
+            $timeStart = time();
             $api .= "/reset-config-redis";
-
             try {
                 $call = Http::withHeaders([
                     'lang' => 'vi',
@@ -65,7 +80,8 @@ class CurlLocamosCommand extends Command
                     'type' => 'curl-locamos',
                     'data' => [
                         'status' => $call->status(),
-                        'api' => $api
+                        'api' => $api,
+                        'time' => time() - $timeStart
                     ]
                 ]);
             } catch (Exception $exception) {
@@ -78,6 +94,7 @@ class CurlLocamosCommand extends Command
 
     private function sendNotification(string $apiLink, string $text)
     {
+        return;
         $chatId = "-902454915";
         $token = env('TOKEN_TELEGRAM');
         $api = "https://api.telegram.org/bot{$token}/sendMessage";

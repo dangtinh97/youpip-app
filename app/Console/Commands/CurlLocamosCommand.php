@@ -61,7 +61,6 @@ class CurlLocamosCommand extends Command
 
         foreach (explode(",", $apiText) as $api) {
             $timeStart = time();
-            $api .= "/reset-config-redis";
             try {
                 $call = Http::withHeaders([
                     'lang' => 'vi',

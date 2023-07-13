@@ -13,7 +13,7 @@
 - ```php artisan jwt:secret```
 - ```php artisan key:generate```
 - ```php artisan storage:link```
-
+- ```composer restart-supervisor```
 ```sudo ssh -i /Users/dangtinh/Documents/code2023/cert/LightsailDefaultKey-ap-southeast-1.pem ubuntu@13.214.5.227```
 
 ### certbot

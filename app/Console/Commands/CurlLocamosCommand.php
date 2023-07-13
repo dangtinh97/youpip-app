@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Log;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Http\Client\PendingRequest;
@@ -60,6 +61,13 @@ class CurlLocamosCommand extends Command
                 if ($call->status() !== 200) {
                     $this->sendNotification($api, $call->body());
                 }
+                Log::query()->create([
+                    'type' => 'curl-locamos',
+                    'data' => [
+                        'status' => $call->status(),
+                        'api' => $api
+                    ]
+                ]);
             } catch (Exception $exception) {
                 $this->sendNotification($api, $exception->getMessage());
             }

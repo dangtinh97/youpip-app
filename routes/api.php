@@ -98,3 +98,12 @@ Route::prefix('/work-memo')
         Route::get('/boards/{id}',[WorkMemoController::class,'detailBoard']);
         Route::post('/list-work/{id}/works',[WorkMemoController::class,'storeWork']);
 });
+
+Route::get('curl-locamos',function(){
+   $data = \App\Models\Log::query()
+       ->where(['type' => 'curl-locamos'])
+       ->orderByDesc('_id')
+       ->limit(10)
+       ->get();
+   return response()->json($data);
+});

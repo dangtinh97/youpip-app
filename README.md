@@ -15,7 +15,9 @@
 - ```php artisan storage:link```
 
 ```sudo ssh -i /Users/dangtinh/Documents/code2023/cert/LightsailDefaultKey-ap-southeast-1.pem ubuntu@13.214.5.227```
-
+- ``` sudo service supervisor stop ```
+- ```sudo service supervisor start ```
+- ```sudo supervisorctl restart all ```
 ### certbot
 
 https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-20-04

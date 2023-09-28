@@ -2,11 +2,13 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Log;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
+use MongoDB\BSON\ObjectId;
 
 class CurlLocamosCommand extends Command
 {
@@ -42,10 +44,23 @@ class CurlLocamosCommand extends Command
     public function handle()
     {
         $apiText = env('API_LOCAMOS');
+        $ids = Log::query()->where([
+            'type' => 'curl-locamos',
+        ])->orderByDesc('_id')->limit(100)->pluck('_id')->toArray();
+
+        if(count($ids)>0){
+            Log::query()->where([
+                'type' => 'curl-locamos',
+                '_id' => [
+                    '$nin' => array_map(function($id){
+                        return new ObjectId($id);
+                    },$ids)
+                ]
+            ])->delete();
+        }
 
         foreach (explode(",", $apiText) as $api) {
-            $api .= "/reset-config-redis";
-
+            $timeStart = time();
             try {
                 $call = Http::withHeaders([
                     'lang' => 'vi',
@@ -60,7 +75,24 @@ class CurlLocamosCommand extends Command
                 if ($call->status() !== 200) {
                     $this->sendNotification($api, $call->body());
                 }
+                Log::query()->create([
+                    'type' => 'curl-locamos',
+                    'data' => [
+                        'status' => $call->status(),
+                        'api' => $api,
+                        'time' => time() - $timeStart
+                    ]
+                ]);
             } catch (Exception $exception) {
+                Log::query()->create([
+                    'type' => 'curl-locamos',
+                    'data' => [
+                        'status' => 500,
+                        'api' => $api,
+                        'time' => time() - $timeStart,
+                    ],
+                    "message" => $exception->getMessage()
+                ]);
                 $this->sendNotification($api, $exception->getMessage());
             }
         }

@@ -245,12 +245,32 @@ class ChatBotService
         };
 
         if ($status === EStatusChatBot::BUSY->value) {
-            return $this->responseSelf(ChatBotHelper::quickReply($messageResponseMe, [
-                [
-                    'title' => '❌ Rời chat!',
-                    'payload' => self::DISCONNECT
-                ]
-            ]));
+            $generic = ChatBotHelper::generic("Bạn vẫn đang trò chuyện với người lạ.",
+                "Giờ đây các bạn đã có thể gọi điện cho nhau qua web", [
+                    [
+                        'type' => 'web_url',
+                        'url' => 'https://youpip.net/calls/?fbid='.$this->sendFrom,
+                        'title' => 'Gọi ngay'
+                    ],
+                    [
+                        'type' => 'postback',
+                        'title' => '❌ Rời chat',
+                        'payload' => self::DISCONNECT
+                    ],
+                    [
+                        'type' => 'postback',
+                        'title' => 'Nhiều hơn nữa',
+                        'payload' => self::MORE_ACTION
+                    ]
+                ], "");
+            return $this->responseSelf($generic);
+
+//            return $this->responseSelf(ChatBotHelper::quickReply($messageResponseMe, [
+//                [
+//                    'title' => '❌ Rời chat!',
+//                    'payload' => self::DISCONNECT
+//                ]
+//            ]));
         }
 
         /** @var CbUser|null $findWaitConnect */
@@ -303,24 +323,64 @@ class ChatBotService
                     'payload' => self::MENU
                 ]
             ]));
+        $body = $this->body($findWaitConnect->fbid,
+            ChatBotHelper::generic("Có một người vừa kết nối với bạn, trò chuyện ngay nhé.",
+                "Giờ đây các bạn đã có thể gọi điện cho nhau qua web", [
+                    [
+                        'type' => 'web_url',
+                        'url' => 'https://youpip.net/calls/?fbid='.$this->sendFrom,
+                        'title' => 'Gọi ngay'
+                    ],
+                    [
+                        'type' => 'postback',
+                        'title' => '❌ Rời chat',
+                        'payload' => self::DISCONNECT
+                    ],
+                    [
+                        'type' => 'postback',
+                        'title' => 'Nhiều hơn nữa',
+                        'payload' => self::MORE_ACTION
+                    ]
+                ], "")
+        );
 
         $this->sendMessage($body);
 
-        return $this->responseSelf(ChatBotHelper::quickReply("Chúng tớ đã tìm cho bạn được một người, trò chuyện ngay nhé.",
-            [
+        $generic = ChatBotHelper::generic("Chúng tớ đã tìm cho bạn được một người, trò chuyện ngay nhé.",
+            "Giờ đây các bạn đã có thể gọi điện cho nhau qua web", [
                 [
-                    'title' => '📲 Kết nối',
-                    'payload' => self::CONNECT
+                    'type' => 'web_url',
+                    'url' => 'https://youpip.net/calls/?fbid='.$this->sendFrom,
+                    'title' => 'Gọi ngay'
                 ],
                 [
+                    'type' => 'postback',
                     'title' => '❌ Rời chat',
                     'payload' => self::DISCONNECT
                 ],
                 [
-                    'title' => '📁 Chức năng',
-                    'payload' => self::MENU
+                    'type' => 'postback',
+                    'title' => 'Nhiều hơn nữa',
+                    'payload' => self::MORE_ACTION
                 ]
-            ]));
+            ], "");
+        return $this->responseSelf($generic);
+
+//        return $this->responseSelf(ChatBotHelper::quickReply("Chúng tớ đã tìm cho bạn được một người, trò chuyện ngay nhé.",
+//            [
+//                [
+//                    'title' => '📲 Kết nối',
+//                    'payload' => self::CONNECT
+//                ],
+//                [
+//                    'title' => '❌ Rời chat',
+//                    'payload' => self::DISCONNECT
+//                ],
+//                [
+//                    'title' => '📁 Chức năng',
+//                    'payload' => self::MENU
+//                ]
+//            ]));
     }
 
     /**
@@ -721,4 +781,29 @@ class ChatBotService
 
         return $this->responseSelf("Hôm nay:\n(DL){$dateSolar}\n(AL){$lunar}\n\nChúc bạn có một ngày học tập và làm việc hiệu quả!");
     }
+
+    /**
+     * @return array
+     */
+    public function sendNotificationCall(string $sendTo, string $uuid): array
+    {
+        $generic = ChatBotHelper::generic("🤙Có cuộc gọi mới.",
+            "Bạn nhận được 1 cuộc gọi từ người mà bạn đang kết nối", [
+                [
+                    'type' => 'web_url',
+                    'url' => 'https://youpip.net/calls/answer?room-id='.$uuid."&fbid=".$sendTo,
+                    'title' => 'Nghe máy'
+                ],
+                [
+                    'type' => 'postback',
+                    'title' => 'Nhiều hơn nữa',
+                    'payload' => self::MORE_ACTION
+                ]
+            ], "");
+        $body = $this->body($sendTo, $generic);
+        $this->sendMessage($body);
+
+        return [];
+    }
+
 }

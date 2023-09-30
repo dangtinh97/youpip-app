@@ -13,7 +13,7 @@ use Jenssegers\Mongodb\Relations\HasMany;
  * @property string                                         $status
  * @property string                                         $block
  * @property-read  \Illuminate\Database\Eloquent\Collection $messagesChatGpt
- * @property int                                          $id
+ * @property int                                            $id
  */
 class CbUser extends Model
 {

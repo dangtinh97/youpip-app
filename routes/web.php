@@ -29,3 +29,13 @@ Route::get('/test-schedule',function (){
     dd($user);
    dd("a");
 });
+
+
+Route::group([
+    'prefix' => 'calls'
+],function (){
+    Route::get("/",[\App\Http\Controllers\CallController::class,'index']);
+    Route::get("/send-notification",[\App\Http\Controllers\CallController::class,'sendNotification'])->name('call.send-notification');
+    Route::get('/answer',[\App\Http\Controllers\CallController::class,'answer']);
+    Route::delete('/{id}',[\App\Http\Controllers\CallController::class,'destroyCall'])->name('call.destroy');
+});

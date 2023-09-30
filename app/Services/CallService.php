@@ -38,7 +38,6 @@ class CallService
             'fbid' => $user->fbid_connect
         ]);
         $uuid = Str::uuid()->toString();
-        $uuid = 'dangtinh1997';
 
         $this->callRepository->create([
             'from_user_id' => $user->id,

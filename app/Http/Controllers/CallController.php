@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CallRequest;
+use App\Models\Config;
 use App\Services\CallService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,8 +21,10 @@ class CallController extends Controller
     public function index(CallRequest $request)
     {
         $call = $this->callService->index($request->get('fbid'));
+        $config = Config::query()->where('type','ICE')->first();
+        $ice = $config->data ?? [];
 
-        return view('call.index', compact('call'));
+        return view('call.index', compact('call','ice'));
     }
 
     /**
@@ -42,8 +45,10 @@ class CallController extends Controller
     public function answer(CallRequest $request)
     {
         $answer = $this->callService->answer($request->get('fbid'),$request->get('room-id'));
+        $config = Config::query()->where('type','ICE')->first();
+        $ice = $config->data ?? [];
 
-        return view('call.answer', compact('answer'));
+        return view('call.answer', compact('answer','ice'));
     }
 
     /**

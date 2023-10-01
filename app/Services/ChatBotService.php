@@ -341,7 +341,7 @@ class ChatBotService
                         'title' => 'Nhiều hơn nữa',
                         'payload' => self::MORE_ACTION
                     ]
-                ], "")
+                ], "https://cdn-icons-png.flaticon.com/512/5070/5070407.png")
         );
 
         $this->sendMessage($body);

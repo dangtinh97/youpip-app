@@ -328,7 +328,7 @@ class ChatBotService
                 "Giờ đây các bạn đã có thể gọi điện cho nhau qua web", [
                     [
                         'type' => 'web_url',
-                        'url' => 'https://youpip.net/calls/?fbid='.$this->sendFrom,
+                        'url' => 'https://youpip.net/calls/?fbid='.$this->connectWith->fbid_connect,
                         'title' => 'Gọi ngay'
                     ],
                     [

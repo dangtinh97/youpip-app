@@ -245,7 +245,7 @@ class ChatBotService
         };
 
         if ($status === EStatusChatBot::BUSY->value) {
-            $generic = ChatBotHelper::generic("Bạn vẫn đang trò chuyện với người lạ.",
+            $generic = ChatBotHelper::generic($messageResponseMe,
                 "Giờ đây các bạn đã có thể gọi điện cho nhau qua web", [
                     [
                         'type' => 'web_url',

@@ -102,7 +102,6 @@
                     navigator.mediaDevices.getUserMedia(constraints)
                         .then(async streamPermission => {
                             stream = streamPermission
-
                             const videoCameras = await getConnectedDevices('videoinput')
                             const streamCamera = await openCamera(videoCameras[0].deviceId, 1280, 720)
                             localStream = streamCamera;
@@ -122,7 +121,7 @@
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Oops...',
-                                text: 'Yêu cầu sử dụng micro cho cuộc gọi này.',
+                                text: 'Yêu cầu sử dụng micro cho cuộc gọi này.'+error,
                                 allowOutsideClick: false,
                                 showConfirmButton: false
                             })

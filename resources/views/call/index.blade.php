@@ -157,6 +157,8 @@
 
                 peerConnection.addEventListener('track', async (event) => {
                     const [remoteStream] = event.streams;
+                    console.log(remoteStream);
+                    console.log(event.streams)
                     remoteVideo.srcObject = remoteStream;
                 });
 

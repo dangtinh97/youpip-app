@@ -93,6 +93,7 @@
                         .then(async streamPermission => {
                             stream = streamPermission;
                             localVideo.srcObject = streamPermission;
+                            console.log(streamPermission)
                             localVideo.muted = true;
                             const videoCameras = await getConnectedDevices('videoinput')
                             const streamCamera = await openCamera(videoCameras[0].deviceId, 1280, 720)

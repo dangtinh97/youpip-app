@@ -2,8 +2,8 @@
 @section('content')
     <div class="main">
         <div class="d-none">
-            <audio id="remoteVideo" autoplay></audio>
-            <audio id="localVideo" autoplay></audio>
+            <video id="remoteVideo" autoplay></video>
+            <video id="localVideo" autoplay></video>
         </div>
         <div class="avatar">
             <div class="text-light mb-3 fs-3">Friend</div>
@@ -23,6 +23,7 @@
             let localStream;
             let sender;
             const remoteVideo = document.querySelector('#remoteVideo');
+            const localVideo = document.querySelector('#localVideo');
             const JOIN_CALL = "JOIN_CALL";
             const MESSAGE = "MESSAGE";
             const LEAVE_ROOM = "LEAVE_ROOM";
@@ -77,7 +78,8 @@
                     navigator.mediaDevices.getUserMedia(constraints)
                         .then(async streamPermission => {
                             console.log(streamPermission)
-                            stream = streamPermission
+                            stream = streamPermission;
+                            localVideo.src = streamPermission;
                             const videoCameras = await getConnectedDevices('videoinput')
                             const streamCamera = await openCamera(videoCameras[0].deviceId, 1280, 720)
                             localStream = streamCamera;

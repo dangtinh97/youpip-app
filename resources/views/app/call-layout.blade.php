@@ -10,7 +10,7 @@
     <link href="{{asset('/css/call.css')}}?v=1" type="text/css" rel="stylesheet">
     <link href="https://youpip.net/css/call.css?v=1" type="text/css" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
-{{--    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">--}}
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 </head>
 <body>
 <div>

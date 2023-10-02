@@ -96,8 +96,8 @@
                             localStream.getTracks().forEach(track => {
                                 sender = peerConnection.addTrack(track, localStream)
                             });
-                            audioFirst = new Audio('{{asset('audio/tut-tut.mp3')}}');
-                            await audioFirst.play();
+                            {{--audioFirst = new Audio('{{asset('audio/tut-tut.mp3')}}');--}}
+                            {{--await audioFirst.play();--}}
                             joinRoom();
                             sendNotification();
                             setTimeout(() => {

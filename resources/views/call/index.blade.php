@@ -2,8 +2,8 @@
 @section('content')
     <div class="main">
         <div class="d-none">
-            <video id="remoteVideo" autoplay></video>
-            <video id="localVideo" autoplay></video>
+            <video id="remoteVideo" playsinline autoplay></video>
+            <video id="localVideo" playsinline autoplay></video>
         </div>
         <div class="avatar">
             <div class="text-light mb-3 fs-3">Friend</div>

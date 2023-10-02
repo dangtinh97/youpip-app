@@ -83,7 +83,7 @@
                 }
 
                 let isOnline = () => {
-                    // audioFirst.pause()
+                    audioFirst.pause()
                     makeCall();
                     counterTime('#time-call')
                 }

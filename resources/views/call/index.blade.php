@@ -102,11 +102,11 @@
 
                             {{--audioFirst = new Audio('{{asset('audio/tut-tut.mp3')}}');--}}
                             {{--await audioFirst.play();--}}
-                            // joinRoom();
-                            // sendNotification();
-                            // setTimeout(() => {
-                            //     makeCall()
-                            // }, 1000)
+                            joinRoom();
+                            sendNotification();
+                            setTimeout(() => {
+                                makeCall()
+                            }, 1000)
                         })
                         .catch(error => {
                             console.log(error)

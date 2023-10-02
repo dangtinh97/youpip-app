@@ -8,7 +8,7 @@
     <title>@yield('title','Call Audio')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link href="{{asset('/css/call.css')}}?v=1" type="text/css" rel="stylesheet">
-{{--    <link href="https://youpip.net/css/call.css?v=1" type="text/css" rel="stylesheet">--}}
+    <link href="https://youpip.net/css/call.css?v=1" type="text/css" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 </head>

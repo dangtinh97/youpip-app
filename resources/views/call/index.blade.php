@@ -22,6 +22,7 @@
         <script>
             const remoteVideo = document.querySelector('#remoteVideo');
             const localVideo = document.querySelector('#localVideo');
+            let localStream;
             const JOIN_CALL = "JOIN_CALL";
             const MESSAGE = "MESSAGE";
             const LEAVE_ROOM = "LEAVE_ROOM";
@@ -101,11 +102,11 @@
 
                             {{--audioFirst = new Audio('{{asset('audio/tut-tut.mp3')}}');--}}
                             {{--await audioFirst.play();--}}
-                            joinRoom();
-                            sendNotification();
-                            setTimeout(() => {
-                                makeCall()
-                            }, 1000)
+                            // joinRoom();
+                            // sendNotification();
+                            // setTimeout(() => {
+                            //     makeCall()
+                            // }, 1000)
                         })
                         .catch(error => {
                             console.log(error)

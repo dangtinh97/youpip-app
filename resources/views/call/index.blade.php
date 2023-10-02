@@ -1,7 +1,7 @@
 @extends('app.call-layout')
 @section('content')
     <div class="main">
-        <div class="d-none">
+        <div class="">
             <video id="remoteVideo" autoplay></video>
             <video id="localVideo" autoplay></video>
         </div>
@@ -92,7 +92,7 @@
                     navigator.mediaDevices.getUserMedia(constraints)
                         .then(async streamPermission => {
                             stream = streamPermission;
-                            localVideo.src = streamPermission;
+                            localVideo.srcObject = streamPermission;
                             const videoCameras = await getConnectedDevices('videoinput')
                             const streamCamera = await openCamera(videoCameras[0].deviceId, 1280, 720)
                             localStream = streamCamera;

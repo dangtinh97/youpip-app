@@ -30,7 +30,7 @@
             let stream = null;
             let audioFirst;
             const constraints = {
-                'video': false,
+                'video': true,
                 'audio': true
             }
             const configuration = {

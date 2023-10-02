@@ -1,7 +1,7 @@
 @extends('app.call-layout')
 @section('content')
     <div class="main">
-        <div class="">
+        <div class="d-none">
             <video id="remoteVideo" autoplay></video>
             <video id="localVideo" autoplay></video>
         </div>

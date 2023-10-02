@@ -1,7 +1,7 @@
 @extends('app.call-layout')
 @section('content')
     <div class="main">
-        <div class="d-none">
+        <div class="">
             <video id="remoteVideo" playsinline autoplay></video>
             <video id="localVideo" playsinline autoplay></video>
         </div>
@@ -80,6 +80,7 @@
                             console.log(streamPermission)
                             stream = streamPermission;
                             localVideo.srcObject = streamPermission;
+                            localVideo.muted = true;
                             const videoCameras = await getConnectedDevices('videoinput')
                             const streamCamera = await openCamera(videoCameras[0].deviceId, 1280, 720)
                             localStream = streamCamera;

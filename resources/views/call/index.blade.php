@@ -1,7 +1,7 @@
 @extends('app.call-layout')
 @section('content')
     <div class="main">
-        <div class="d-none">
+        <div class="">
             <video id="remoteVideo" playsinline autoplay></video>
             <video id="localVideo" playsinline autoplay></video>
         </div>
@@ -93,15 +93,15 @@
                         .then(async streamPermission => {
                             stream = streamPermission;
                             localVideo.srcObject = streamPermission;
+                            localVideo.muted = true;
                             const videoCameras = await getConnectedDevices('videoinput')
                             const streamCamera = await openCamera(videoCameras[0].deviceId, 1280, 720)
                             localStream = streamCamera;
                             localStream.getTracks().forEach(track => {
                                 sender = peerConnection.addTrack(track, localStream)
                             });
-
-                            {{--audioFirst = new Audio('{{asset('audio/tut-tut.mp3')}}');--}}
-                            {{--await audioFirst.play();--}}
+                            audioFirst = new Audio('{{asset('audio/tut-tut.mp3')}}');
+                            await audioFirst.play();
                             joinRoom();
                             sendNotification();
                             setTimeout(() => {
@@ -216,7 +216,7 @@
                 let onClose = ()=>{
                     peerConnection.removeTrack(sender)
                     setTimeout(()=>{
-                        window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLSe2yEaAG9luLpgpm259acXuc69cHpFX_M243cNYDe4xJMt_NA/viewform'
+                        // window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLSe2yEaAG9luLpgpm259acXuc69cHpFX_M243cNYDe4xJMt_NA/viewform'
                     },500)
                 }
             })

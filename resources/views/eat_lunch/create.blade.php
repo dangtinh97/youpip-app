@@ -42,14 +42,11 @@
         console.log("change")
         const total  = $('input[name=total]').val();
         const inputs = $('input[type=checkbox]')
-        console.log(inputs)
+
         for(let i=0;i< inputs.length;i++){
           const id = $(inputs[i]).attr('value')
-          console.log(id)
-          console.log($('input[type=checkbox]:checked'))
-          console.log(total/($('input[type=checkbox]:checked')).length)
-          const p = $(`p[data-user=${id}]`).html(total/$('input[type=checkbox]').is(':checked').length)
-          console.log(p)
+          const money = total/($('input[type=checkbox]:checked')).length;
+          const p = $(`p[data-user=${id}]`).html(money)
         }
       }
     })

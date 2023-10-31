@@ -21,7 +21,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('command:curl-locamos')->everyMinute();
-        $schedule->command('command:team-eat-lunch')->dailyAt('05:00');
+        $schedule->command('command:team-eat-lunch')->dailyAt('05:40');
     }
 
     /**

@@ -10,7 +10,7 @@
 <div class="container mt-4 px-4">
     <form method="POST" action="{{str_replace("http://","https://",route('eat-lunch.api'))}}">
         <div>
-            <p>Date: {{date('d/m/Y',time())}}</p>
+            <input class="form-control" type="text" value="{{date('d/m/Y',time())}}" name="date">
         </div>
         <div class="form-group">
             <label>So tien</label>

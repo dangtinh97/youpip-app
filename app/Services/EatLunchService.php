@@ -15,15 +15,16 @@ class EatLunchService
     public function store(array $data): bool
     {
         $total = (int)$data['total'];
-
+        $date = Arr::get($data,'date',date('Y/m/d'));
+        $this->teamLunchMoneyRepository->deleteWhere(['date' => $date]);
         $users = Arr::get($data, 'user');
         $inserts = [];
         foreach ($users as $userName) {
             $inserts[] = [
                 'username' => $userName,
-                'total' => $total,
+                'total' => $total/count($users),
                 'paid' => false,
-                'date' => date('Y/m/d'),
+                'date' => $date,
                 'created_at' => new UTCDateTime(time() * 1000),
                 'updated_at' => new UTCDateTime(time() * 1000)
             ];

@@ -42,7 +42,7 @@
       function changeMoney(){
         console.log("change")
         const total  = $('input[name=total]').val();
-        const inputs = $('input[type=checkbox]')
+        const inputs = $('input[type=checkbox]:checked')
 
         for(let i=0;i< inputs.length;i++){
           const id = $(inputs[i]).attr('value')

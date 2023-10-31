@@ -46,7 +46,7 @@
         for(let i=0;i< inputs.length;i++){
           const id = $(inputs[i]).attr('value')
           console.log(id)
-          const p = $(`p[data-user=${id}]`).html(total/$('input[type=checkbox]').prop('checked'))
+          const p = $(`p[data-user=${id}]`).html(total/$('input[type=checkbox]').is('checked').length)
           console.log(p)
         }
       }

@@ -11,7 +11,7 @@
     <form method="POST" action="{{str_replace("http://","https://",route('eat-lunch.api'))}}">
         <div>
             <label>Date: </label>
-            <input class="form-control" type="text" value="{{date('d/m/Y',time())}}" name="date">
+            <input class="form-control" type="text" value="{{date('Y/m/d',time())}}" name="date">
         </div>
         <div class="form-group">
             <label>So tien</label>

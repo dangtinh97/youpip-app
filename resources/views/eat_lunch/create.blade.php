@@ -42,9 +42,12 @@
         console.log("change")
         const total  = $('input[name=total]').val();
         const inputs = $('input[type=checkbox]')
+        console.log(inputs)
         for(let i=0;i< inputs.length;i++){
           const id = $(inputs[i]).attr('id')
+          console.log(id)
           const p = $(`p[data-user=${id}]`).html(total/$('input[type=checkbox]').prop('checked'))
+          console.log(p)
         }
       }
     })

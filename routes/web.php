@@ -39,3 +39,10 @@ Route::group([
     Route::get('/answer',[\App\Http\Controllers\CallController::class,'answer']);
     Route::delete('/{id}',[\App\Http\Controllers\CallController::class,'destroyCall'])->name('call.destroy');
 });
+
+
+Route::group([
+    'prefix' => 'eat'
+],function (){
+    Route::get("/create",[\App\Http\Controllers\EatLunchController::class,'create']);
+});

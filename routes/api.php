@@ -120,3 +120,6 @@ Route::get('curl-locamos', function () {
         ->toArray();
     return response()->json($data);
 });
+
+
+Route::post("/eat-lunch",[\App\Http\Controllers\EatLunchController::class,'store'])->name('eat-lunch.api');

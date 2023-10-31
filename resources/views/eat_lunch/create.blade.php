@@ -8,7 +8,7 @@
 </head>
 <body>
 <div class="container mt-4 px-4">
-    <form method="POST" action="{{route('eat-lunch.api')}}">
+    <form method="POST" action="{{str_replace("http://","https://",route('eat-lunch.api'))}}">
         <div>
             <p>Date: {{date('d/m/Y',time())}}</p>
         </div>

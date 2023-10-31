@@ -44,5 +44,5 @@ Route::group([
 Route::group([
     'prefix' => 'eat'
 ],function (){
-    Route::get("/create",[\App\Http\Controllers\EatLunchController::class,'create']);
+    Route::get("/create",[\App\Http\Controllers\EatLunchController::class,'create'])->name('team-eat-lunch');
 });

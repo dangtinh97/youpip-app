@@ -56,7 +56,7 @@
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
         ],
-        "restart-supervisor" : [
+        "restart-ctl" : [
             "service supervisor stop",
             "service supervisor start",
             "supervisorctl restart all"

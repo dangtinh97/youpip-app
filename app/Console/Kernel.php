@@ -20,7 +20,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('command:curl-locamos')->everyMinute();
+        $schedule->command('command:curl-locamos')->everyFiveMinutes();
         $schedule->command('command:team-eat-lunch')->dailyAt('05:40');
     }
 

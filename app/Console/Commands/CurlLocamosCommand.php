@@ -93,7 +93,6 @@ class CurlLocamosCommand extends Command
                     ],
                     "message" => $exception->getMessage()
                 ]);
-                $this->sendNotification($api, $exception->getMessage());
             }
             sleep(10);
         }

@@ -123,3 +123,29 @@ Route::get('curl-locamos', function () {
 
 
 Route::post("/eat-lunch",[\App\Http\Controllers\EatLunchController::class,'store'])->name('eat-lunch.api');
+Route::post('/mophong-score',function (Request $request){
+
+    $curl = curl_init();
+
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => 'https://mophong.laixehaivan.edu.vn/test/submit/ajax_chamdiem.php',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_POSTFIELDS => array('check_chamdiem' => 'yes','stt_cauhoi' => '1','id_cauhoi' => $request->get('question'),'second_traloi' => $request->get('time'),'percent_traloi' => '49.53497775980'),
+        CURLOPT_HTTPHEADER => array(
+            'Cookie: PHPSESSID=0ff036b0457dc8b4d1a616eae8a87fad'
+        ),
+    ));
+
+    $response = curl_exec($curl);
+
+    curl_close($curl);
+    $res = str_replace(["\n","\r"],"",$response);
+    $json = json_decode($res,true);
+    return response()->json($json);
+});

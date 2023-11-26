@@ -147,5 +147,17 @@ Route::post('/mophong-score',function (Request $request){
     curl_close($curl);
     $res = str_replace(["\n","\r"],"",$response);
     $json = json_decode($res,true);
+    \App\Models\SimulatorAns::query()->create([
+       'question_id' => (int)$request->get('question'),
+        'result_0' => \Illuminate\Support\Arr::get($json,'ketqua_dapan0'),
+        'result_1' => \Illuminate\Support\Arr::get($json,'ketqua_dapan1'),
+        'result_2' => \Illuminate\Support\Arr::get($json,'ketqua_dapan2'),
+        'result_3' => \Illuminate\Support\Arr::get($json,'ketqua_dapan3'),
+        'result_4' => \Illuminate\Support\Arr::get($json,'ketqua_dapan4'),
+        'result_5' => \Illuminate\Support\Arr::get($json,'ketqua_dapan5'),
+        'score' => \Illuminate\Support\Arr::get($json,'chamdiem'),
+        'duration'  => (float)$request->get('duration')
+    ]);
+
     return response()->json($json);
 });

@@ -70,6 +70,7 @@ class CurlLocamosCommand extends Command
                     $html = "API ERROR:\nStatus code: $code";
                     $this->sendNotification($api, $html);
 
+
                     return false;
                 })->get($api);
                 if ($call->status() !== 200) {

@@ -93,7 +93,7 @@ class CurlLocamosCommand extends Command
                     ],
                     "message" => $exception->getMessage()
                 ]);
-                $this->sendNotification($api, $exception->getMessage());
+//                $this->sendNotification($api, $exception->getMessage());
             }
         }
 
@@ -105,7 +105,7 @@ class CurlLocamosCommand extends Command
         $chatId = "-902454915";
         $token = env('TOKEN_TELEGRAM');
         $api = "https://api.telegram.org/bot{$token}/sendMessage";
-        $curl = Http::post($api, [
+        $curl = Http::timeout(10)->post($api, [
             "chat_id" => $chatId,
             "text" => "LINK API: $apiLink\n Error: $text",
             "parse_mode" => "HTML"

@@ -20,7 +20,8 @@
         "laravel/tinker": "^2.5",
         "openai-php/client": "^0.4.1",
         "sunra/php-simple-html-dom-parser": "^1.5",
-        "tymon/jwt-auth": "^1.0@dev"
+        "tymon/jwt-auth": "^1.0@dev",
+      "ext-curl": "*"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

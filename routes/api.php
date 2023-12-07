@@ -161,3 +161,10 @@ Route::post('/mophong-score',function (Request $request){
 
     return response()->json($json);
 });
+
+
+Route::get("/demo-webhook",function (){
+   $res = \App\Helper\ChatBotHelper::sendToOwner(date('Y/m/d H:i:s',strtotime('+7 hours')));
+
+   return response()->json($res);
+});

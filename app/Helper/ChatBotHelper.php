@@ -3,6 +3,7 @@
 namespace App\Helper;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Http;
 
 class ChatBotHelper
 {
@@ -71,5 +72,37 @@ class ChatBotHelper
         }
 
         return $text;
+    }
+
+
+    public static function sendToOwner(string $text): array{
+        try{
+            $body = [
+                "recipient" => [
+                    "id" => "1343954529053153"
+                ],
+                "messaging_type" => "RESPONSE",
+                "message" => ChatBotHelper::quickReply($text, [
+                    [
+                        'title' => 'âm lịch',
+                        'payload' => 'LUNAR_CALENDAR'
+                    ],
+                    [
+                        'title' => 'Tìm thông tin sđt',
+                        'payload' => 'FIND_PHONE'
+                    ],
+                ])
+            ];
+            $url = 'https://graph.facebook.com/v16.0/'.env('PAGE_ID', '482929468728139')
+                .'/messages?access_token='.env('PAGE_ACCESS_TOKEN');
+            $send = Http::withBody(json_encode($body), 'application/json')
+                ->timeout(7)
+                ->post($url);
+
+            return $send->json();
+        }catch (\Exception $exception){
+            return [$exception->getMessage()];
+        }
+
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helper\ChatBotHelper;
 use App\Models\Log;
 use Exception;
 use Illuminate\Console\Command;
@@ -65,7 +66,8 @@ class CurlLocamosCommand extends Command
                 $call = Http::withHeaders([
                     'lang' => 'vi',
                     'gmt' => '420'
-                ])->timeout(10)->retry(3, 1000, function (Exception $exception) use ($api) {
+                ])->timeout(10)
+                    ->retry(3, 1000, function (Exception $exception) use ($api) {
                     $code = $exception->getCode();
                     $html = "API ERROR:\nStatus code: $code";
                     $this->sendNotification($api, $html);
@@ -103,13 +105,15 @@ class CurlLocamosCommand extends Command
 
     private function sendNotification(string $apiLink, string $text)
     {
-        $chatId = "-902454915";
-        $token = env('TOKEN_TELEGRAM');
-        $api = "https://api.telegram.org/bot{$token}/sendMessage";
-        $curl = Http::timeout(10)->post($api, [
-            "chat_id" => $chatId,
-            "text" => "LINK API: $apiLink\n Error: $text",
-            "parse_mode" => "HTML"
-        ]);
+        ChatBotHelper::sendToOwner("LINK API: $apiLink\n Error: $text");
+
+//        $chatId = "-902454915";
+//        $token = env('TOKEN_TELEGRAM');
+//        $api = "https://api.telegram.org/bot{$token}/sendMessage";
+//        $curl = Http::timeout(10)->post($api, [
+//            "chat_id" => $chatId,
+//            "text" => "LINK API: $apiLink\n Error: $text",
+//            "parse_mode" => "HTML"
+//        ]);
     }
 }

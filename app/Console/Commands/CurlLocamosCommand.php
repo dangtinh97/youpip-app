@@ -66,16 +66,8 @@ class CurlLocamosCommand extends Command
                 $call = Http::withHeaders([
                     'lang' => 'vi',
                     'gmt' => '420'
-                ])->timeout(10)
-                    ->retry(3, 1000, function (Exception $exception) use ($api) {
-                    $code = $exception->getCode();
-                    $html = "API ERROR:\nStatus code: $code";
-                    $this->sendNotification($api, $html);
-
-
-                    return false;
-                })->get($api);
-                if ($call->status() !== 200) {
+                ])->timeout(10)->get($api);
+                if (!$call->successful()) {
                     $this->sendNotification($api, $call->body());
                 }
                 Log::query()->create([
